@@ -1,0 +1,17 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+federation:
+  rounds: 10
+  min_clients: 2
+  fraction_fit: 1.0          # fraction of clients used per round
+  fraction_evaluate: 1.0
+  aggregation_strategy: fedavg
+
+model:
+  output_path: /output/global_model.pt
+
+api:
+  host: "0.0.0.0"
+  port: 5000

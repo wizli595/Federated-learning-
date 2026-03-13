@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+*.egg
+
+# Environment
+.env
+*.env.local
+
+# Output / models
+output/*.pt
+output/*.pth
+output/*.pkl
+output/*.bin
+output/*.onnx
+
+# Logs
+logs/
+*.log
+
+# Node / Dashboard
+node_modules/
+dashboard/build/
+dashboard/.env
+
+# Docker
+.docker/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
