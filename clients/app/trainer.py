@@ -6,10 +6,19 @@ import torch.nn as nn
 from .config import BATCH_SIZE, LOCAL_EPOCHS, LR
 
 
-def train(model: nn.Module, X_train: torch.Tensor, y_train: torch.Tensor) -> float:
-    """Run LOCAL_EPOCHS of local training. Returns average training loss."""
+def train(
+    model: nn.Module,
+    X_train: torch.Tensor,
+    y_train: torch.Tensor,
+    epochs: int | None = None,
+    lr: float | None = None,
+) -> float:
+    """Run local training. epochs/lr override config values if provided."""
+    effective_epochs = epochs if epochs is not None else LOCAL_EPOCHS
+    effective_lr     = lr     if lr     is not None else LR
+
     model.train()
-    optimizer = torch.optim.Adam(model.parameters(), lr=LR)
+    optimizer = torch.optim.Adam(model.parameters(), lr=effective_lr)
     criterion = nn.CrossEntropyLoss()
     loader = torch.utils.data.DataLoader(
         torch.utils.data.TensorDataset(X_train, y_train),
@@ -18,7 +27,7 @@ def train(model: nn.Module, X_train: torch.Tensor, y_train: torch.Tensor) -> flo
     )
 
     total_loss = 0.0
-    for _ in range(LOCAL_EPOCHS):
+    for _ in range(effective_epochs):
         epoch_loss = 0.0
         for X_batch, y_batch in loader:
             optimizer.zero_grad()

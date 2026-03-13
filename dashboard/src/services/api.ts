@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
-
 const api = axios.create({ baseURL: API_URL, timeout: 10_000 });
 
 export interface RoundMetric {
@@ -11,17 +10,45 @@ export interface RoundMetric {
   avg_accuracy: number | null;
 }
 
+export interface TrainingConfig {
+  local_epochs: number;
+  learning_rate: number;
+  total_rounds: number;
+  input_dim: number;
+  num_classes: number;
+}
+
 export interface FLStatus {
   state: "waiting" | "round_open" | "aggregating" | "finished";
   current_round: number;
   total_rounds: number;
   registered_clients: number;
   submissions_this_round: number;
+  submitted_client_ids: string[];
   metrics: RoundMetric[];
+  client_ids: string[];
+  training_config: TrainingConfig | null;
 }
 
-export const fetchStatus = (): Promise<FLStatus> =>
+export const fetchStatus    = (): Promise<FLStatus> =>
   api.get("/status").then((r) => r.data);
 
-export const startTraining = (input_dim: number, num_classes: number) =>
-  api.post("/start", { input_dim, num_classes }).then((r) => r.data);
+export const startTraining  = (
+  input_dim: number,
+  num_classes: number,
+  rounds: number,
+  local_epochs: number,
+  learning_rate: number,
+) => api.post("/start", { input_dim, num_classes, rounds, local_epochs, learning_rate }).then((r) => r.data);
+
+export const stopTraining   = () =>
+  api.post("/stop").then((r) => r.data);
+
+export const resumeTraining = () =>
+  api.post("/resume").then((r) => r.data);
+
+export const kickClient           = (clientId: string) =>
+  api.post(`/clients/${clientId}/kick`).then((r) => r.data);
+
+export const kickAndRestartClient = (clientId: string) =>
+  api.post(`/clients/${clientId}/kick-and-restart`).then((r) => r.data);

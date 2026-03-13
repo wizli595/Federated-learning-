@@ -8,6 +8,9 @@ from .state import ServerState
 class StartRequest(BaseModel):
     input_dim: int
     num_classes: int = 2
+    rounds: int = 10
+    local_epochs: int = 5
+    learning_rate: float = 0.01
 
 
 class RegisterResponse(BaseModel):
@@ -18,8 +21,8 @@ class RegisterResponse(BaseModel):
 class SubmitRequest(BaseModel):
     client_id: str
     num_samples: int
-    weights: List[List[float]]  # flattened parameter arrays
-    shapes: List[List[int]]     # original shape of each parameter
+    weights: List[List[float]]
+    shapes: List[List[int]]
     loss: Optional[float] = None
     accuracy: Optional[float] = None
 
@@ -30,4 +33,7 @@ class StatusResponse(BaseModel):
     total_rounds: int
     registered_clients: int
     submissions_this_round: int
+    submitted_client_ids: List[str]
     metrics: List[dict]
+    client_ids: List[str]
+    training_config: Optional[Dict] = None

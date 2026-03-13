@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 import numpy as np
 import torch
 
-from .config import FL_ROUNDS, OUTPUT_PATH
+from .config import OUTPUT_PATH
 from .state import FLState, ServerState
 
 log = logging.getLogger("fl-server.aggregation")
@@ -69,9 +69,9 @@ async def aggregate_and_advance(state: FLState) -> None:
         log.info("Checkpoint saved → %s", OUTPUT_PATH)
 
         # Advance or finish
-        if state.current_round >= FL_ROUNDS:
+        if state.current_round >= state.total_rounds:
             state.state = ServerState.FINISHED
-            log.info("All %d rounds complete. Training finished.", FL_ROUNDS)
+            log.info("All %d rounds complete. Training finished.", state.total_rounds)
         else:
             state.current_round += 1
             state.submissions.clear()
