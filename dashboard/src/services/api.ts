@@ -3,11 +3,18 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
 const api = axios.create({ baseURL: API_URL, timeout: 10_000 });
 
+export interface PerClientMetric {
+  loss:        number | null;
+  accuracy:    number | null;
+  num_samples: number | null;
+}
+
 export interface RoundMetric {
-  round: number;
-  num_clients: number;
-  avg_loss: number | null;
+  round:        number;
+  num_clients:  number;
+  avg_loss:     number | null;
   avg_accuracy: number | null;
+  per_client:   Record<string, PerClientMetric>;
 }
 
 export interface TrainingConfig {

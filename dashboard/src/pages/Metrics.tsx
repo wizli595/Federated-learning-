@@ -3,7 +3,7 @@ import MetricsCharts    from "../components/metrics/MetricsCharts";
 import RoundHistoryTable from "../components/metrics/RoundHistoryTable";
 
 export default function Metrics({ data }: { data: FLStatus }) {
-  const { metrics } = data;
+  const { metrics, client_ids } = data;
 
   // Enrich with per-round deltas
   const enriched = metrics.map((m, i) => {
@@ -39,7 +39,7 @@ export default function Metrics({ data }: { data: FLStatus }) {
       ) : (
         <>
           <MetricsCharts   metrics={metrics} enriched={enriched} />
-          <RoundHistoryTable metrics={enriched} />
+          <RoundHistoryTable metrics={enriched} clientIds={client_ids} />
         </>
       )}
 

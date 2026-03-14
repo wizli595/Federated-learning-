@@ -30,11 +30,20 @@ def fedavg(submissions: Dict[str, dict]) -> List[np.ndarray]:
 def _compute_round_metrics(round_num: int, submissions: Dict[str, dict]) -> dict:
     losses = [s["loss"] for s in submissions.values() if s["loss"] is not None]
     accs = [s["accuracy"] for s in submissions.values() if s["accuracy"] is not None]
+    per_client = {
+        cid: {
+            "loss":        s.get("loss"),
+            "accuracy":    s.get("accuracy"),
+            "num_samples": s.get("num_samples"),
+        }
+        for cid, s in submissions.items()
+    }
     return {
-        "round": round_num,
-        "num_clients": len(submissions),
-        "avg_loss": float(np.mean(losses)) if losses else None,
+        "round":        round_num,
+        "num_clients":  len(submissions),
+        "avg_loss":     float(np.mean(losses)) if losses else None,
         "avg_accuracy": float(np.mean(accs)) if accs else None,
+        "per_client":   per_client,
     }
 
 
