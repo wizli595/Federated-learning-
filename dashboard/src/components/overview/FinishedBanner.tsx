@@ -7,7 +7,7 @@ interface Props {
 
 export default function FinishedBanner({ roundsCompleted, latestMetric }: Props) {
   return (
-    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5 text-center">
+    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5 text-center animate-scale-in">
       <p className="text-emerald-400 font-medium">
         Training complete — {roundsCompleted} rounds finished
       </p>

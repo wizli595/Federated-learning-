@@ -23,7 +23,7 @@ export default function PausedBanner({ currentRound, totalRounds, onNewSession }
   };
 
   return (
-    <div className="bg-zinc-900 border border-amber-500/20 rounded-xl p-5 space-y-4">
+    <div className="bg-zinc-900 border border-amber-500/20 rounded-xl p-5 space-y-4 animate-scale-in">
       <div>
         <h2 className="text-sm font-medium text-zinc-300">Training Paused</h2>
         <p className="text-xs text-zinc-500 mt-0.5">
@@ -41,7 +41,7 @@ export default function PausedBanner({ currentRound, totalRounds, onNewSession }
           disabled={resuming}
           className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500
                      disabled:opacity-50 text-white text-sm font-medium rounded-lg
-                     transition-colors cursor-pointer"
+                     transition-all duration-150 active:scale-95 cursor-pointer"
         >
           <RotateCcw size={14} />
           {resuming ? "Resuming…" : "Resume Training"}

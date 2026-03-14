@@ -29,10 +29,10 @@ export default function Sidebar({ connected }: { connected: boolean }) {
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 cursor-pointer
               ${isActive
-                ? "bg-blue-500/10 text-blue-400 font-medium"
-                : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+                ? "bg-blue-500/10 text-blue-400 font-medium translate-x-0.5 shadow-[inset_2px_0_0_0_rgb(96,165,250)]"
+                : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 hover:translate-x-0.5"
               }`
             }
           >
@@ -51,10 +51,10 @@ export default function Sidebar({ connected }: { connected: boolean }) {
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 cursor-pointer
               ${isActive
-                ? "bg-blue-500/10 text-blue-400 font-medium"
-                : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
+                ? "bg-blue-500/10 text-blue-400 font-medium translate-x-0.5 shadow-[inset_2px_0_0_0_rgb(96,165,250)]"
+                : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 hover:translate-x-0.5"
               }`
             }
           >
@@ -67,12 +67,18 @@ export default function Sidebar({ connected }: { connected: boolean }) {
       {/* Connection status */}
       <div className="px-5 py-4 border-t border-zinc-800">
         <div className="flex items-center gap-2">
+          <span className="relative flex h-2 w-2 shrink-0">
+            {connected && (
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-50" />
+            )}
+            <span className={`relative inline-flex h-2 w-2 rounded-full ${connected ? "bg-emerald-400" : "bg-red-400"}`} />
+          </span>
           {connected
             ? <Wifi size={14} className="text-emerald-400" />
             : <WifiOff size={14} className="text-red-400" />
           }
           <span className={`text-xs ${connected ? "text-emerald-400" : "text-red-400"}`}>
-            {connected ? "Server connected" : "Server offline"}
+            {connected ? "Connected" : "Offline"}
           </span>
         </div>
       </div>

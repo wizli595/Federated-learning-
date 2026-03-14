@@ -5,7 +5,7 @@ import ClientTable        from "../components/clients/ClientTable";
 export default function Clients({ data }: { data: FLStatus }) {
   const {
     registered_clients, submissions_this_round,
-    client_ids, submitted_client_ids, current_round, state,
+    client_ids, submitted_client_ids, current_round, state, client_submissions,
   } = data;
 
   const pending = Math.max(0, registered_clients - submissions_this_round);
@@ -34,6 +34,7 @@ export default function Clients({ data }: { data: FLStatus }) {
       <ClientTable
         clientIds={client_ids}
         submittedIds={submitted_client_ids}
+        clientSubmissions={client_submissions}
         state={state}
         currentRound={current_round}
       />

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { CheckCircle, AlertTriangle, Info } from "lucide-react";
 import { type ActivityEvent } from "../../hooks/useFL";
 
@@ -8,6 +9,14 @@ function EventIcon({ type }: { type: ActivityEvent["type"] }) {
 }
 
 export default function ActivityLog({ events }: { events: ActivityEvent[] }) {
+  // Track which event IDs have already been seen so only truly new ones animate
+  const seenIds = useRef(new Set<number>());
+  const isNew = (id: number) => {
+    if (seenIds.current.has(id)) return false;
+    seenIds.current.add(id);
+    return true;
+  };
+
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col">
       <div className="px-4 py-3 border-b border-zinc-800">
@@ -18,7 +27,11 @@ export default function ActivityLog({ events }: { events: ActivityEvent[] }) {
           <p className="px-4 py-6 text-xs text-zinc-500 text-center">No events yet.</p>
         ) : (
           events.map((e) => (
-            <div key={e.id} className="px-4 py-2.5 flex gap-2.5 items-start">
+            <div
+              key={e.id}
+              className={`px-4 py-2.5 flex gap-2.5 items-start
+                ${isNew(e.id) ? "animate-slide-in-left" : ""}`}
+            >
               <EventIcon type={e.type} />
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-zinc-300 leading-snug">{e.message}</p>

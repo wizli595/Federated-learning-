@@ -5,7 +5,7 @@ from typing import List, Tuple
 import numpy as np
 import requests
 
-from .config import CLIENT_ID, MAX_RETRIES, POLL_INTERVAL, SERVER_URL
+from .config import CLIENT_ID, POLL_INTERVAL, SERVER_URL
 
 log = logging.getLogger("fl-client.comms")
 
@@ -18,10 +18,27 @@ def _post(path: str, **kwargs) -> requests.Response:
     return requests.post(f"{SERVER_URL}{path}", **kwargs)
 
 
-def wait_for_server_ready() -> None:
-    """Block until the server is in round_open state."""
-    log.info("Waiting for server to start training...")
-    for attempt in range(1, MAX_RETRIES + 1):
+def wait_for_server_reachable() -> None:
+    """Block indefinitely until the server responds (any state)."""
+    log.info("Waiting for FL server to be reachable...")
+    attempt = 0
+    while True:
+        try:
+            resp = _get("/status", timeout=5)
+            resp.raise_for_status()
+            log.info("Server reachable — state: %s", resp.json().get("state"))
+            return
+        except Exception:
+            pass
+        attempt += 1
+        log.info("Server unreachable — attempt %d (will keep retrying)", attempt)
+        time.sleep(POLL_INTERVAL)
+
+
+def wait_for_round_open() -> None:
+    """Block indefinitely until the server enters round_open state."""
+    log.info("Waiting for training to start (round_open)...")
+    while True:
         try:
             resp = _get("/status", timeout=5)
             resp.raise_for_status()
@@ -29,23 +46,22 @@ def wait_for_server_ready() -> None:
                 return
         except Exception:
             pass
-        log.info("Server not ready — attempt %d/%d", attempt, MAX_RETRIES)
         time.sleep(POLL_INTERVAL)
-    raise RuntimeError("Server did not start training in time.")
 
 
 def register() -> None:
     """Register this client with the FL server."""
-    for attempt in range(1, MAX_RETRIES + 1):
+    attempt = 0
+    while True:
         try:
             resp = _post(f"/register?client_id={CLIENT_ID}", timeout=5)
             resp.raise_for_status()
             log.info("Registered as '%s'", CLIENT_ID)
             return
         except Exception as e:
-            log.warning("Register attempt %d/%d failed: %s", attempt, MAX_RETRIES, e)
+            attempt += 1
+            log.warning("Register attempt %d failed: %s", attempt, e)
             time.sleep(POLL_INTERVAL)
-    raise RuntimeError("Could not register with FL server after max retries.")
 
 
 def fetch_weights() -> Tuple[List[np.ndarray], int]:

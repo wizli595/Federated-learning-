@@ -13,7 +13,10 @@ export default function ProgressBar({
   labelRight,
   footer,
 }: Props) {
-  const bar = color === "emerald" ? "bg-emerald-500" : "bg-blue-500";
+  const bar    = color === "emerald" ? "bg-emerald-500" : "bg-blue-500";
+  const shadow = color === "emerald"
+    ? "shadow-[0_0_8px_2px_rgba(52,211,153,0.35)]"
+    : "shadow-[0_0_8px_2px_rgba(59,130,246,0.35)]";
   const clamped = Math.min(100, Math.max(0, value));
 
   return (
@@ -26,7 +29,7 @@ export default function ProgressBar({
       )}
       <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
         <div
-          className={`h-full ${bar} rounded-full transition-all duration-700`}
+          className={`h-full ${bar} ${clamped > 0 ? shadow : ""} rounded-full transition-all duration-700`}
           style={{ width: `${clamped}%` }}
         />
       </div>

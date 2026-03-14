@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { useFL } from "./hooks/useFL";
 import Sidebar from "./components/Sidebar";
 import Overview from "./pages/Overview";
@@ -8,7 +8,8 @@ import Explanation from "./pages/Explanation";
 import Docs        from "./pages/Docs";
 
 export default function App() {
-  const { data, error, loading, events, eta } = useFL();
+  const { data, error, loading, events, eta, clientJoinTimes } = useFL();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -27,7 +28,10 @@ export default function App() {
   return (
     <div className="flex h-full">
       <Sidebar connected={!error} />
-      <main className="ml-56 flex-1 p-8 overflow-y-auto">
+      <main
+        key={location.pathname}
+        className="ml-56 flex-1 p-8 overflow-y-auto animate-fade-in-up"
+      >
         {serverDown ? (
           <Routes>
             <Route path="/explanation" element={<Explanation />} />
@@ -44,7 +48,7 @@ export default function App() {
           </Routes>
         ) : (
           <Routes>
-            <Route path="/"            element={<Overview data={data!} events={events} eta={eta} />} />
+            <Route path="/"            element={<Overview data={data!} events={events} eta={eta} clientJoinTimes={clientJoinTimes} />} />
             <Route path="/metrics"     element={<Metrics  data={data!} />} />
             <Route path="/clients"     element={<Clients  data={data!} />} />
             <Route path="/explanation" element={<Explanation />} />

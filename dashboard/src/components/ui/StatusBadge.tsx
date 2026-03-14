@@ -36,7 +36,7 @@ export default function StatusBadge({ state }: { state: FLStatus["state"] }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ring-1 ${cfg.ring} bg-zinc-900`}>
+      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ring-1 ${cfg.ring} bg-zinc-900 transition-all duration-300`}>
       <span className="relative flex h-2 w-2">
         {isLive && (
           <span

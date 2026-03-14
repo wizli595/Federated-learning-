@@ -18,6 +18,12 @@ export interface TrainingConfig {
   num_classes: number;
 }
 
+export interface ClientSubmission {
+  loss:        number | null;
+  accuracy:    number | null;
+  num_samples: number | null;
+}
+
 export interface FLStatus {
   state: "waiting" | "round_open" | "aggregating" | "finished";
   current_round: number;
@@ -28,6 +34,7 @@ export interface FLStatus {
   metrics: RoundMetric[];
   client_ids: string[];
   training_config: TrainingConfig | null;
+  client_submissions: Record<string, ClientSubmission>;
 }
 
 export const fetchStatus    = (): Promise<FLStatus> =>
@@ -46,6 +53,9 @@ export const stopTraining   = () =>
 
 export const resumeTraining = () =>
   api.post("/resume").then((r) => r.data);
+
+export const resetTraining  = () =>
+  api.post("/reset").then((r) => r.data);
 
 export const kickClient           = (clientId: string) =>
   api.post(`/clients/${clientId}/kick`).then((r) => r.data);

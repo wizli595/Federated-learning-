@@ -20,13 +20,8 @@ router = APIRouter()
 
 @router.post("/register", response_model=RegisterResponse, tags=["federation"])
 async def register(client_id: str):
-    """Client announces itself to the server."""
+    """Client announces itself to the server. Allowed in WAITING and ROUND_OPEN states."""
     async with fl_state.lock:
-        if fl_state.state == ServerState.WAITING:
-            raise HTTPException(
-                status_code=status.HTTP_425_TOO_EARLY,
-                detail="Server not started. Call POST /start first.",
-            )
         if fl_state.state == ServerState.FINISHED:
             raise HTTPException(
                 status_code=status.HTTP_410_GONE,

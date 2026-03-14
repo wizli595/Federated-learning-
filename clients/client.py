@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 from app.config import CLIENT_ID, DATA_PATH, NUM_CLASSES, SERVER_URL
-from app.comms import fetch_training_config, fetch_weights, register, submit, wait_for_next_round, wait_for_server_ready
+from app.comms import fetch_training_config, fetch_weights, register, submit, wait_for_next_round, wait_for_server_reachable, wait_for_round_open
 from app.data import load_data
 from app.trainer import evaluate, train
 
@@ -26,8 +26,9 @@ def main() -> None:
     input_dim = X_train.shape[1]
     log.info("Dataset — samples=%d  features=%d  num_classes=%d", num_samples, input_dim, NUM_CLASSES)
 
-    wait_for_server_ready()
+    wait_for_server_reachable()
     register()
+    wait_for_round_open()
 
     # Fetch hyperparameters set by the user in the dashboard
     server_cfg = fetch_training_config()
@@ -61,8 +62,9 @@ def main() -> None:
                 log.info("Round %d complete — training finished. Standing by for next session…", current_round)
             else:
                 log.info("Server paused/restarted. Waiting for it to come back up…")
-            wait_for_server_ready()
+            wait_for_server_reachable()
             register()
+            wait_for_round_open()
             server_cfg   = fetch_training_config()
             train_epochs = server_cfg.get("local_epochs") or train_epochs
             train_lr     = server_cfg.get("learning_rate") or train_lr

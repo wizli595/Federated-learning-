@@ -37,3 +37,4 @@ class StatusResponse(BaseModel):
     metrics: List[dict]
     client_ids: List[str]
     training_config: Optional[Dict] = None
+    client_submissions: Dict[str, Dict] = {}

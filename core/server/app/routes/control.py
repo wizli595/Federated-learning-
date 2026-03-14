@@ -32,6 +32,14 @@ def get_status():
         metrics=fl_state.metrics,
         client_ids=list(fl_state.clients.keys()),
         training_config=fl_state.training_config,
+        client_submissions={
+            cid: {
+                "loss":        s.get("loss"),
+                "accuracy":    s.get("accuracy"),
+                "num_samples": s.get("num_samples"),
+            }
+            for cid, s in fl_state.submissions.items()
+        },
     )
 
 
@@ -96,6 +104,15 @@ async def stop_training():
 
     log.info("Training paused at round %d. Weights and metrics preserved.", stopped_at)
     return {"message": "Training paused", "stopped_at_round": stopped_at}
+
+
+@router.post("/reset", tags=["control"])
+async def reset_session():
+    """Hard reset — wipes all state (weights, metrics, config) and returns to WAITING."""
+    async with fl_state.lock:
+        fl_state.reset()
+    log.info("Session hard-reset. Server back to WAITING state.")
+    return {"message": "Session reset"}
 
 
 @router.post("/resume", tags=["control"])

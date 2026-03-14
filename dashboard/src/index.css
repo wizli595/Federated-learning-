@@ -13,3 +13,33 @@
   ::-webkit-scrollbar-track { @apply bg-transparent; }
   ::-webkit-scrollbar-thumb { @apply bg-zinc-700 rounded-full; }
 }
+
+/* Page route transition */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.22s ease-out, transform 0.22s ease-out;
+}
+
+/* Stagger delays for list items */
+.stagger-1  { animation-delay: 0ms; }
+.stagger-2  { animation-delay: 40ms; }
+.stagger-3  { animation-delay: 80ms; }
+.stagger-4  { animation-delay: 120ms; }
+.stagger-5  { animation-delay: 160ms; }
+.stagger-6  { animation-delay: 200ms; }
+.stagger-7  { animation-delay: 240ms; }
+.stagger-8  { animation-delay: 280ms; }
+
+/* Respect reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

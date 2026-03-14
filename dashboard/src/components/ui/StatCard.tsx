@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from "react";
 import { type LucideIcon } from "lucide-react";
 
 interface Props {
@@ -17,14 +18,35 @@ const ACCENT = {
 
 export default function StatCard({ label, value, icon: Icon, accent = "zinc", sub }: Props) {
   const a = ACCENT[accent];
+  const prevValue = useRef(value);
+  const [flashing, setFlashing] = useState(false);
+
+  useEffect(() => {
+    if (prevValue.current !== value) {
+      prevValue.current = value;
+      setFlashing(true);
+      const t = setTimeout(() => setFlashing(false), 650);
+      return () => clearTimeout(t);
+    }
+  }, [value]);
+
   return (
-    <div className={`rounded-xl border ${a.border} ${a.bg} p-5 flex flex-col gap-3`}>
+    <div
+      className={`rounded-xl border ${a.border} ${a.bg} p-5 flex flex-col gap-3
+        transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:shadow-black/30
+        cursor-default`}
+    >
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{label}</span>
-        <Icon size={16} className={a.icon} />
+        <Icon size={16} className={`${a.icon} transition-transform duration-200 group-hover:scale-110`} />
       </div>
       <div className="flex items-end gap-2">
-        <span className="text-3xl font-mono font-semibold text-zinc-100">{value}</span>
+        <span
+          className={`text-3xl font-mono font-semibold text-zinc-100 transition-colors duration-300
+            ${flashing ? "text-blue-300" : ""}`}
+        >
+          {value}
+        </span>
         {sub && <span className="text-sm text-zinc-500 mb-1">{sub}</span>}
       </div>
     </div>

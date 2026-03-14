@@ -16,7 +16,8 @@ export interface FLHookResult {
   error: string | null;
   loading: boolean;
   events: ActivityEvent[];
-  eta: number | null; // seconds remaining
+  eta: number | null;
+  clientJoinTimes: Record<string, Date>; // client_id → time first seen
 }
 
 let eventId = 0;
@@ -32,7 +33,8 @@ export function useFL(): FLHookResult {
 
   // Refs to track previous state between polls (no re-render needed)
   const prev              = useRef<FLStatus | null>(null);
-  const roundTimestamps   = useRef<number[]>([]); // unix ms when each round completed
+  const roundTimestamps   = useRef<number[]>([]);
+  const joinTimes         = useRef<Record<string, Date>>({});
 
   const addEvent = useCallback((message: string, type: ActivityEvent["type"] = "info") => {
     setEvents((e) => [makeEvent(message, type), ...e].slice(0, MAX_EVENTS));
@@ -61,10 +63,19 @@ export function useFL(): FLHookResult {
           addEvent(messages[status.state], types[status.state]);
         }
 
-        // New client registered
+        // New client registered — record join time and emit event
         if (status.registered_clients > p.registered_clients) {
+          const now = new Date();
+          const newIds = status.client_ids.filter((id) => !p.client_ids.includes(id));
+          newIds.forEach((id) => { joinTimes.current[id] = now; });
           const diff = status.registered_clients - p.registered_clients;
           addEvent(`${diff} client(s) registered (total: ${status.registered_clients})`, "info");
+        }
+
+        // Client left (kicked or reset) — remove their join time
+        if (status.registered_clients < p.registered_clients) {
+          const gone = p.client_ids.filter((id) => !status.client_ids.includes(id));
+          gone.forEach((id) => { delete joinTimes.current[id]; });
         }
 
         // New submission
@@ -113,5 +124,5 @@ export function useFL(): FLHookResult {
     return Math.round((remaining * avgMs) / 1000);
   })();
 
-  return { data, error, loading, events, eta };
+  return { data, error, loading, events, eta, clientJoinTimes: joinTimes.current };
 }

@@ -11,7 +11,7 @@ function ConfigPill({ label, value }: { label: string; value: string | number })
 
 export default function ActiveConfigStrip({ config }: { config: TrainingConfig }) {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-3 flex flex-wrap gap-6">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-3 flex flex-wrap gap-6 animate-fade-in">
       <ConfigPill label="Rounds"    value={config.total_rounds} />
       <ConfigPill label="Epochs"    value={config.local_epochs} />
       <ConfigPill label="LR"        value={config.learning_rate} />
