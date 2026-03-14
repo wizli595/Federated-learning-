@@ -5,6 +5,7 @@ import Overview from "./pages/Overview";
 import Metrics from "./pages/Metrics";
 import Clients from "./pages/Clients";
 import Explanation from "./pages/Explanation";
+import Docs        from "./pages/Docs";
 
 export default function App() {
   const { data, error, loading, events, eta } = useFL();
@@ -30,6 +31,7 @@ export default function App() {
         {serverDown ? (
           <Routes>
             <Route path="/explanation" element={<Explanation />} />
+            <Route path="/docs"        element={<Docs />} />
             <Route path="*" element={
               <div className="flex h-full items-center justify-center">
                 <div className="text-center space-y-2">
@@ -46,6 +48,7 @@ export default function App() {
             <Route path="/metrics"     element={<Metrics  data={data!} />} />
             <Route path="/clients"     element={<Clients  data={data!} />} />
             <Route path="/explanation" element={<Explanation />} />
+            <Route path="/docs"        element={<Docs />} />
           </Routes>
         )}
       </main>

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, LineChart, Users, BookOpen, Wifi, WifiOff } from "lucide-react";
+import { LayoutDashboard, LineChart, Users, BookOpen, FileCode2, Wifi, WifiOff } from "lucide-react";
 
 const NAV = [
   { to: "/",            label: "Overview",    icon: LayoutDashboard },
@@ -8,7 +8,8 @@ const NAV = [
 ];
 
 const NAV_BOTTOM = [
-  { to: "/explanation", label: "How it works", icon: BookOpen },
+  { to: "/explanation", label: "How it works",  icon: BookOpen   },
+  { to: "/docs",        label: "Code Reference", icon: FileCode2  },
 ];
 
 export default function Sidebar({ connected }: { connected: boolean }) {

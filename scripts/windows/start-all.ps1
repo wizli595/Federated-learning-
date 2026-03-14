@@ -10,9 +10,9 @@ Write-Host ">> Starting clients..."
 docker compose -f "$ROOT\clients\docker-compose.yml" up -d --build
 
 Write-Host ">> Starting dashboard..."
-Set-Location "$ROOT\dashboard"
-npm install --silent
-Start-Process npm -ArgumentList "run", "dev" -WindowStyle Normal
+$DASHBOARD = "$ROOT\dashboard"
+& npm --prefix "$DASHBOARD" install --silent
+Start-Process cmd -ArgumentList "/c", "npm run dev" -WorkingDirectory "$DASHBOARD" -WindowStyle Normal
 
 Write-Host ""
 Write-Host "Stack running:"
