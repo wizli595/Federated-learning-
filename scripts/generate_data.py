@@ -4,10 +4,10 @@ generate_data.py — Generate synthetic tabular classification data for FL testi
 Creates one CSV partition per client under clients/data/client-{i}/.
 
 Usage:
-    python scripts/generate_data.py [--clients 3] [--samples 1000] [--features 20] [--classes 2]
+    python scripts/generate_data.py [--clients 3] [--samples 300] [--features 20] [--classes 2]
 
-Each partition has a slightly different class distribution to simulate
-realistic non-IID federated data (heterogeneous clients).
+Each partition has a heavily skewed class distribution to simulate
+extreme non-IID federated data (heterogeneous clients).
 """
 
 import argparse
@@ -35,10 +35,10 @@ log = logging.getLogger("generate-data")
 # CLI args
 # ---------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description="Generate synthetic FL dataset partitions")
-parser.add_argument("--clients",  type=int, default=3,    help="Number of client partitions")
-parser.add_argument("--samples",  type=int, default=1000, help="Total samples (split across clients)")
-parser.add_argument("--features", type=int, default=20,   help="Number of input features")
-parser.add_argument("--classes",  type=int, default=2,    help="Number of output classes")
+parser.add_argument("--clients",  type=int, default=3,   help="Number of client partitions")
+parser.add_argument("--samples",  type=int, default=300, help="Total samples (split across clients)")
+parser.add_argument("--features", type=int, default=20,  help="Number of input features")
+parser.add_argument("--classes",  type=int, default=2,   help="Number of output classes")
 parser.add_argument("--seed",     type=int, default=42)
 args = parser.parse_args()
 
@@ -56,11 +56,11 @@ log.info("Generating dataset — samples=%d  features=%d  classes=%d  seed=%d",
 X, y = make_classification(
     n_samples=args.samples,
     n_features=args.features,
-    n_informative=max(2, args.features // 2),
+    n_informative=2,             # only 2 truly informative features; 18 are noise
     n_redundant=max(1, args.features // 5),
     n_classes=args.classes,
-    class_sep=0.3,   # harder: closer class boundaries
-    flip_y=0.08,     # 8% label noise
+    class_sep=0.1,               # heavy class overlap — nearly indistinguishable
+    flip_y=0.20,                 # 20% label noise — 1 in 5 labels is wrong
     random_state=args.seed,
 )
 
@@ -72,23 +72,47 @@ log.info("Dataset created — total rows=%d  class balance=%s",
          len(df), df["label"].value_counts().sort_index().to_dict())
 
 # ---------------------------------------------------------------------------
-# Non-IID split
+# Extreme non-IID split
 # ---------------------------------------------------------------------------
-log.info("Splitting into %d non-IID partitions (sorted by label before split)", args.clients)
+log.info("Splitting into %d non-IID partitions (extreme class skew per client)", args.clients)
 
-df_sorted   = df.sort_values("label").reset_index(drop=True)
-partitions  = np.array_split(df_sorted, args.clients)
+per_client = args.samples // args.clients
 
-for i, partition in enumerate(partitions):
-    client_id = f"client-{i + 1}"
+class0 = df[df["label"] == 0].sample(frac=1, random_state=args.seed).reset_index(drop=True)
+class1 = df[df["label"] == 1].sample(frac=1, random_state=args.seed).reset_index(drop=True)
+
+# Ratios: client-1 90/10, client-2 50/50, client-3 10/90
+# For >3 clients the remaining ones get 50/50
+ratios = {1: (0.9, 0.1), 2: (0.5, 0.5), 3: (0.1, 0.9)}
+
+c0_cursor = 0
+c1_cursor = 0
+
+for i in range(1, args.clients + 1):
+    r0, r1 = ratios.get(i, (0.5, 0.5))
+    n0 = round(per_client * r0)
+    n1 = per_client - n0
+
+    # Clamp to available rows
+    n0 = min(n0, len(class0) - c0_cursor)
+    n1 = min(n1, len(class1) - c1_cursor)
+
+    chunk = pd.concat([
+        class0.iloc[c0_cursor : c0_cursor + n0],
+        class1.iloc[c1_cursor : c1_cursor + n1],
+    ]).sample(frac=1, random_state=args.seed + i).reset_index(drop=True)
+
+    c0_cursor += n0
+    c1_cursor += n1
+
+    client_id = f"client-{i}"
     out_dir   = DATA_ROOT / client_id
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    partition  = partition.sample(frac=1, random_state=args.seed + i).reset_index(drop=True)
-    out_path   = out_dir / "dataset.csv"
-    partition.to_csv(out_path, index=False)
+    out_path = out_dir / "dataset.csv"
+    chunk.to_csv(out_path, index=False)
 
-    class_dist = partition["label"].value_counts().sort_index().to_dict()
-    log.info("%-10s  rows=%-4d  classes=%s  →  %s", client_id, len(partition), class_dist, out_path)
+    class_dist = chunk["label"].value_counts().sort_index().to_dict()
+    log.info("%-10s  rows=%-4d  classes=%s  →  %s", client_id, len(chunk), class_dist, out_path)
 
 log.info("Done. Data written to %s", DATA_ROOT)

@@ -106,11 +106,15 @@ export default function Overview({ data, events, eta, clientJoinTimes }: Props) 
 
       {/* ── Stat cards ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up stagger-2">
-        <StatCard label="Current Round" value={data.current_round} icon={RefreshCw}
-          sub={`/ ${data.total_rounds}`} accent="blue" />
-        <StatCard label="Clients"       value={data.registered_clients}     icon={Users}    accent="amber" />
-        <StatCard label="Submissions"   value={data.submissions_this_round} icon={Activity}
-          sub={`/ ${data.registered_clients}`} accent="emerald" />
+        <StatCard
+          label="Round"
+          value={data.total_rounds > 0 ? `${data.current_round} / ${data.total_rounds}` : "—"}
+          icon={RefreshCw}
+          accent="blue"
+        />
+        <StatCard label="Clients"     value={data.registered_clients}     icon={Users}    accent="amber" />
+        <StatCard label="Submissions" value={data.submissions_this_round} icon={Activity}
+          sub={data.registered_clients > 0 ? `/ ${data.registered_clients}` : undefined} accent="emerald" />
         <StatCard label="Best Accuracy"
           value={latestMetric?.avg_accuracy != null
             ? `${(latestMetric.avg_accuracy * 100).toFixed(1)}%` : "—"}
