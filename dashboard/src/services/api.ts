@@ -10,11 +10,12 @@ export interface PerClientMetric {
 }
 
 export interface RoundMetric {
-  round:        number;
-  num_clients:  number;
-  avg_loss:     number | null;
-  avg_accuracy: number | null;
-  per_client:   Record<string, PerClientMetric>;
+  round:             number;
+  num_clients:       number;
+  avg_loss:          number | null;
+  avg_accuracy:      number | null;
+  per_client:        Record<string, PerClientMetric>;
+  duration_seconds?: number;
 }
 
 export interface TrainingConfig {
@@ -69,3 +70,13 @@ export const kickClient           = (clientId: string) =>
 
 export const kickAndRestartClient = (clientId: string) =>
   api.post(`/clients/${clientId}/kick-and-restart`).then((r) => r.data);
+
+export const downloadModel = async () => {
+  const resp = await api.get("/model/download", { responseType: "blob" });
+  const url  = URL.createObjectURL(resp.data);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = "global_model.pt";
+  a.click();
+  URL.revokeObjectURL(url);
+};

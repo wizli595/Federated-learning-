@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { type RoundMetric } from "../../services/api";
 import Delta from "./Delta";
 
@@ -28,8 +28,23 @@ function buildClientRows(metrics: EnrichedMetric[], clientId: string) {
   });
 }
 
+function bestRound(metrics: EnrichedMetric[]): number | null {
+  const withAcc = metrics.filter((m) => m.avg_accuracy != null);
+  if (withAcc.length === 0) return null;
+  const best = withAcc.reduce((a, b) => {
+    if (b.avg_accuracy! > a.avg_accuracy!) return b;
+    if (b.avg_accuracy! === a.avg_accuracy!) {
+      // tiebreak: lower loss wins
+      if ((b.avg_loss ?? Infinity) < (a.avg_loss ?? Infinity)) return b;
+    }
+    return a;
+  });
+  return best.round;
+}
+
 export default function RoundHistoryTable({ metrics, clientIds }: Props) {
   const [activeTab, setActiveTab] = useState<"all" | string>("all");
+  const bestRoundNum = useMemo(() => bestRound(metrics), [metrics]);
 
   const tabs = ["all", ...clientIds];
 
@@ -63,6 +78,7 @@ export default function RoundHistoryTable({ metrics, clientIds }: Props) {
               <tr className="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider">
                 <th className="px-5 py-3 text-left">Round</th>
                 <th className="px-5 py-3 text-left">Clients</th>
+                <th className="px-5 py-3 text-right font-mono">Duration</th>
                 <th className="px-5 py-3 text-right font-mono">Loss</th>
                 <th className="px-5 py-3 text-right font-mono">Loss Delta</th>
                 <th className="px-5 py-3 text-right font-mono">Accuracy</th>
@@ -70,24 +86,37 @@ export default function RoundHistoryTable({ metrics, clientIds }: Props) {
               </tr>
             </thead>
             <tbody>
-              {[...metrics].reverse().map((m) => (
-                <tr key={m.round} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                  <td className="px-5 py-3 font-mono text-zinc-300">{m.round}</td>
-                  <td className="px-5 py-3 text-zinc-400">{m.num_clients}</td>
-                  <td className="px-5 py-3 text-right font-mono text-blue-400">
-                    {m.avg_loss?.toFixed(4) ?? "—"}
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    <Delta value={m.loss_delta} invert />
-                  </td>
-                  <td className="px-5 py-3 text-right font-mono text-emerald-400">
-                    {m.avg_accuracy != null ? `${(m.avg_accuracy * 100).toFixed(2)}%` : "—"}
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    <Delta value={m.accuracy_delta} percent />
-                  </td>
-                </tr>
-              ))}
+              {[...metrics].reverse().map((m) => {
+                const isBest = m.round === bestRoundNum;
+                return (
+                  <tr
+                    key={m.round}
+                    className={`border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors
+                      ${isBest ? "border-l-2 border-l-amber-400 bg-amber-500/5" : ""}`}
+                  >
+                    <td className="px-5 py-3 font-mono text-zinc-300">
+                      {isBest && <span className="mr-1 text-amber-400">★</span>}
+                      {m.round}
+                    </td>
+                    <td className="px-5 py-3 text-zinc-400">{m.num_clients}</td>
+                    <td className="px-5 py-3 text-right font-mono text-zinc-500">
+                      {m.duration_seconds != null ? `${m.duration_seconds}s` : "—"}
+                    </td>
+                    <td className="px-5 py-3 text-right font-mono text-blue-400">
+                      {m.avg_loss?.toFixed(4) ?? "—"}
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <Delta value={m.loss_delta} invert />
+                    </td>
+                    <td className="px-5 py-3 text-right font-mono text-emerald-400">
+                      {m.avg_accuracy != null ? `${(m.avg_accuracy * 100).toFixed(2)}%` : "—"}
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <Delta value={m.accuracy_delta} percent />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         ) : (

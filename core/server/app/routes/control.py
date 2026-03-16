@@ -3,8 +3,9 @@ import sys
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi.responses import FileResponse
 
-from ..config import MIN_CLIENTS
+from ..config import MIN_CLIENTS, OUTPUT_PATH
 from ..schemas import StartRequest, StatusResponse
 from ..state import ServerState, fl_state
 
@@ -89,21 +90,31 @@ async def start_training(req: StartRequest):
 @router.post("/stop", tags=["control"])
 async def stop_training():
     """
-    Soft-pause the session.
-    Preserves global weights, metrics, and round counter so training can be resumed.
-    Clients and pending submissions are cleared so clients must re-register on resume.
+    Request a graceful stop after the current round completes.
+    Sets stop_requested flag; aggregation will finish the session instead of opening the next round.
     """
     async with fl_state.lock:
-        if fl_state.state == ServerState.WAITING:
+        if fl_state.state not in (ServerState.ROUND_OPEN, ServerState.AGGREGATING):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="Server is already in WAITING state.",
+                detail=f"Cannot stop: training is not active (state={fl_state.state})",
             )
-        stopped_at = fl_state.current_round
-        fl_state.soft_reset()
+        fl_state.stop_requested = True
 
-    log.info("Training paused at round %d. Weights and metrics preserved.", stopped_at)
-    return {"message": "Training paused", "stopped_at_round": stopped_at}
+    log.info("Stop requested — training will finish after the current round.")
+    return {"message": "Stop requested — will finish after this round"}
+
+
+@router.get("/model/download", tags=["control"])
+def download_model():
+    """Download the saved global model checkpoint."""
+    if not OUTPUT_PATH.exists():
+        raise HTTPException(status_code=404, detail="Model file not found. Run at least one round first.")
+    return FileResponse(
+        path=str(OUTPUT_PATH),
+        media_type="application/octet-stream",
+        filename="global_model.pt",
+    )
 
 
 @router.post("/reset", tags=["control"])

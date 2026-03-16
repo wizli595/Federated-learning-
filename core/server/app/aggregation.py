@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -27,7 +28,7 @@ def fedavg(submissions: Dict[str, dict]) -> List[np.ndarray]:
     return aggregated
 
 
-def _compute_round_metrics(round_num: int, submissions: Dict[str, dict]) -> dict:
+def _compute_round_metrics(round_num: int, submissions: Dict[str, dict], duration_seconds: float) -> dict:
     losses = [s["loss"] for s in submissions.values() if s["loss"] is not None]
     accs = [s["accuracy"] for s in submissions.values() if s["accuracy"] is not None]
     per_client = {
@@ -39,11 +40,12 @@ def _compute_round_metrics(round_num: int, submissions: Dict[str, dict]) -> dict
         for cid, s in submissions.items()
     }
     return {
-        "round":        round_num,
-        "num_clients":  len(submissions),
-        "avg_loss":     float(np.mean(losses)) if losses else None,
-        "avg_accuracy": float(np.mean(accs)) if accs else None,
-        "per_client":   per_client,
+        "round":            round_num,
+        "num_clients":      len(submissions),
+        "avg_loss":         float(np.mean(losses)) if losses else None,
+        "avg_accuracy":     float(np.mean(accs)) if accs else None,
+        "per_client":       per_client,
+        "duration_seconds": round(duration_seconds, 1),
     }
 
 
@@ -56,8 +58,10 @@ async def aggregate_and_advance(state: FLState) -> None:
 
     log.info("Round %d — aggregating %d submissions", state.current_round, len(state.submissions))
 
+    round_start = time.time()
     new_weights = fedavg(state.submissions)
-    metrics = _compute_round_metrics(state.current_round, state.submissions)
+    duration = time.time() - round_start
+    metrics = _compute_round_metrics(state.current_round, state.submissions, duration)
 
     async with state.lock:
         # Update model weights
@@ -67,20 +71,22 @@ async def aggregate_and_advance(state: FLState) -> None:
         state.metrics.append(metrics)
 
         log.info(
-            "Round %d complete — loss=%s  acc=%s",
+            "Round %d complete — loss=%s  acc=%s  duration=%.1fs",
             state.current_round,
             f"{metrics['avg_loss']:.4f}" if metrics["avg_loss"] is not None else "N/A",
             f"{metrics['avg_accuracy']:.4f}" if metrics["avg_accuracy"] is not None else "N/A",
+            duration,
         )
 
         # Save checkpoint
         torch.save(state.model.state_dict(), OUTPUT_PATH)
         log.info("Checkpoint saved → %s", OUTPUT_PATH)
 
-        # Advance or finish
-        if state.current_round >= state.total_rounds:
+        # Advance or finish (honour stop_requested flag)
+        if state.current_round >= state.total_rounds or state.stop_requested:
+            state.stop_requested = False
             state.state = ServerState.FINISHED
-            log.info("All %d rounds complete. Training finished.", state.total_rounds)
+            log.info("Training finished after round %d.", state.current_round)
         else:
             state.current_round += 1
             state.submissions.clear()

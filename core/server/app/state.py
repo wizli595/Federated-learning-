@@ -24,6 +24,7 @@ class FLState:
         self.submissions: Dict[str, dict] = {}  # client_id → {weights, num_samples, loss, accuracy}
         self.metrics: List[dict]         = []
         self.training_config: Optional[dict] = None
+        self.stop_requested: bool        = False
         self.lock = asyncio.Lock()
 
     def reset(self) -> None:
@@ -37,12 +38,14 @@ class FLState:
         self.submissions     = {}
         self.metrics         = []
         self.training_config = None
+        self.stop_requested  = False
 
     def soft_reset(self) -> None:
         """Pause — preserves global weights, metrics, and round info so training can resume."""
-        self.state       = ServerState.WAITING
-        self.clients     = {}
-        self.submissions = {}
+        self.state           = ServerState.WAITING
+        self.clients         = {}
+        self.submissions     = {}
+        self.stop_requested  = False
 
 
 # Single shared instance

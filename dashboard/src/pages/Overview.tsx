@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Activity, Users, BarChart2, RefreshCw, Square, Clock, RotateCcw } from "lucide-react";
+import { Activity, Users, BarChart2, RefreshCw, Square, Clock, RotateCcw, Download } from "lucide-react";
 
 import StatCard          from "../components/ui/StatCard";
 import StatusBadge       from "../components/ui/StatusBadge";
@@ -13,7 +13,7 @@ import PausedBanner       from "../components/overview/PausedBanner";
 import FinishedBanner     from "../components/overview/FinishedBanner";
 import WaitingRoom, { MIN_CLIENTS } from "../components/overview/WaitingRoom";
 
-import { type FLStatus, stopTraining, resetTraining } from "../services/api";
+import { type FLStatus, stopTraining, resetTraining, downloadModel } from "../services/api";
 import { type ActivityEvent } from "../hooks/useFL";
 
 interface Props {
@@ -55,11 +55,18 @@ export default function Overview({ data, events, eta, clientJoinTimes }: Props) 
   const handleStop = () => {
     setStopping(true);
     toast.promise(stopTraining(), {
-      loading: "Pausing training...",
-      success: "Training paused. Weights preserved — you can resume.",
-      error:   "Failed to pause training",
+      loading: "Requesting stop…",
+      success: "Stop requested — training will finish after this round.",
+      error:   (e) => { setStopping(false); return e?.response?.data?.detail ?? "Failed to stop training"; },
     });
-    setStopping(false);
+  };
+
+  const handleDownload = () => {
+    toast.promise(downloadModel(), {
+      loading: "Preparing download…",
+      success: "Download started",
+      error:   "Model file not found",
+    });
   };
 
   return (
@@ -80,25 +87,36 @@ export default function Overview({ data, events, eta, clientJoinTimes }: Props) 
           )}
           <StatusBadge state={data.state} />
           {data.state === "finished" && (
-            <button
-              onClick={handleReset} disabled={resetting}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700
-                         border border-zinc-700 text-zinc-300 text-xs font-medium rounded-lg
-                         transition-all duration-150 active:scale-95 disabled:opacity-50 cursor-pointer"
-            >
-              <RotateCcw size={11} />
-              {resetting ? "Resetting…" : "Reset"}
-            </button>
+            <>
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700
+                           border border-zinc-700 text-zinc-300 text-xs font-medium rounded-lg
+                           transition-all duration-150 active:scale-95 cursor-pointer"
+              >
+                <Download size={11} />
+                Download global_model.pt
+              </button>
+              <button
+                onClick={handleReset} disabled={resetting}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700
+                           border border-zinc-700 text-zinc-300 text-xs font-medium rounded-lg
+                           transition-all duration-150 active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                <RotateCcw size={11} />
+                {resetting ? "Resetting…" : "Reset"}
+              </button>
+            </>
           )}
           {isActive && (
             <button
               onClick={handleStop} disabled={stopping}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20
-                         border border-amber-500/30 text-amber-400 text-xs font-medium rounded-lg
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20
+                         border border-red-500/30 text-red-400 text-xs font-medium rounded-lg
                          transition-all duration-150 active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Square size={11} />
-              {stopping ? "Pausing…" : "Pause"}
+              {stopping ? "Stopping…" : "Stop"}
             </button>
           )}
         </div>
