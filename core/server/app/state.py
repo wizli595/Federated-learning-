@@ -1,4 +1,5 @@
 import asyncio
+import time
 from enum import Enum
 from typing import Dict, List, Optional  # noqa: F401
 
@@ -25,6 +26,7 @@ class FLState:
         self.metrics: List[dict]         = []
         self.training_config: Optional[dict] = None
         self.stop_requested: bool        = False
+        self.round_start_time: float     = 0.0
         self.lock = asyncio.Lock()
 
     def reset(self) -> None:
@@ -37,8 +39,9 @@ class FLState:
         self.clients         = {}
         self.submissions     = {}
         self.metrics         = []
-        self.training_config = None
-        self.stop_requested  = False
+        self.training_config  = None
+        self.stop_requested   = False
+        self.round_start_time = 0.0
 
     def soft_reset(self) -> None:
         """Pause — preserves global weights, metrics, and round info so training can resume."""

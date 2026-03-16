@@ -58,9 +58,8 @@ async def aggregate_and_advance(state: FLState) -> None:
 
     log.info("Round %d — aggregating %d submissions", state.current_round, len(state.submissions))
 
-    round_start = time.time()
     new_weights = fedavg(state.submissions)
-    duration = time.time() - round_start
+    duration = time.time() - state.round_start_time
     metrics = _compute_round_metrics(state.current_round, state.submissions, duration)
 
     async with state.lock:
@@ -90,5 +89,6 @@ async def aggregate_and_advance(state: FLState) -> None:
         else:
             state.current_round += 1
             state.submissions.clear()
+            state.round_start_time = time.time()
             state.state = ServerState.ROUND_OPEN
             log.info("Round %d opened.", state.current_round)

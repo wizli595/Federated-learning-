@@ -1,5 +1,6 @@
 import logging
 import sys
+import time
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, status
@@ -76,6 +77,7 @@ async def start_training(req: StartRequest):
             "input_dim":      req.input_dim,
             "num_classes":    req.num_classes,
         }
+        fl_state.round_start_time = time.time()
         fl_state.state = ServerState.ROUND_OPEN
 
     log.info(
@@ -145,6 +147,7 @@ async def resume_training():
             )
         fl_state.submissions.clear()
         fl_state.clients.clear()
+        fl_state.round_start_time = time.time()
         fl_state.state = ServerState.ROUND_OPEN
 
     log.info("Training resumed at round %d / %d.", fl_state.current_round, fl_state.total_rounds)
