@@ -70,12 +70,16 @@ async def start_training(req: StartRequest):
         fl_state.global_weights = get_weights(fl_state.model)
         fl_state.total_rounds   = req.rounds
         fl_state.current_round  = 1
+        fl_state.algorithm = req.algorithm
+        fl_state.mu = req.mu
         fl_state.training_config = {
             "local_epochs":   req.local_epochs,
             "learning_rate":  req.learning_rate,
             "total_rounds":   req.rounds,
             "input_dim":      req.input_dim,
             "num_classes":    req.num_classes,
+            "algorithm":      req.algorithm,
+            "mu":             req.mu,
         }
         fl_state.round_start_time = time.time()
         fl_state.state = ServerState.ROUND_OPEN

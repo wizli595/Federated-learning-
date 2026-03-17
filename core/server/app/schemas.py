@@ -11,6 +11,8 @@ class StartRequest(BaseModel):
     rounds: int = 10
     local_epochs: int = 5
     learning_rate: float = 0.01
+    algorithm: str = "fedavg"
+    mu: float = 0.1
 
 
 class RegisterResponse(BaseModel):

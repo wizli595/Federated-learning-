@@ -10,6 +10,10 @@ function ConfigPill({ label, value }: { label: string; value: string | number })
 }
 
 export default function ActiveConfigStrip({ config }: { config: TrainingConfig }) {
+  const algoLabel = config.algorithm === "fedprox"
+    ? `FedProx μ=${config.mu ?? 0.1}`
+    : "FedAvg";
+
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-3 flex flex-wrap gap-6 animate-fade-in">
       <ConfigPill label="Rounds"    value={config.total_rounds} />
@@ -17,6 +21,7 @@ export default function ActiveConfigStrip({ config }: { config: TrainingConfig }
       <ConfigPill label="LR"        value={config.learning_rate} />
       <ConfigPill label="Input dim" value={config.input_dim} />
       <ConfigPill label="Classes"   value={config.num_classes} />
+      <ConfigPill label="Algorithm" value={algoLabel} />
     </div>
   );
 }

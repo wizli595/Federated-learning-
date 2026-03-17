@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { type RoundMetric } from "../../services/api";
 import Delta from "./Delta";
 
@@ -8,8 +8,8 @@ type EnrichedMetric = RoundMetric & {
 };
 
 interface Props {
-  metrics:   EnrichedMetric[];
-  clientIds: string[];
+  metrics:    EnrichedMetric[];
+  clientIds?: string[]; // unused — tabs derived from per_client data instead
 }
 
 // Build per-client rows with deltas across rounds
@@ -42,11 +42,26 @@ function bestRound(metrics: EnrichedMetric[]): number | null {
   return best.round;
 }
 
-export default function RoundHistoryTable({ metrics, clientIds }: Props) {
+export default function RoundHistoryTable({ metrics }: Props) {
   const [activeTab, setActiveTab] = useState<"all" | string>("all");
   const bestRoundNum = useMemo(() => bestRound(metrics), [metrics]);
 
-  const tabs = ["all", ...clientIds];
+  // Derive client list from historical per_client data — always accurate,
+  // independent of who is currently registered (clientIds prop can be stale).
+  const derivedClientIds = useMemo(() => {
+    const ids = new Set<string>();
+    metrics.forEach((m) => Object.keys(m.per_client ?? {}).forEach((id) => ids.add(id)));
+    return Array.from(ids).sort();
+  }, [metrics]);
+
+  const tabs = ["all", ...derivedClientIds];
+
+  // Reset to "all" if active tab no longer exists in derived list
+  useEffect(() => {
+    if (activeTab !== "all" && !derivedClientIds.includes(activeTab)) {
+      setActiveTab("all");
+    }
+  }, [derivedClientIds, activeTab]);
 
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">

@@ -64,8 +64,8 @@ def register() -> None:
             time.sleep(POLL_INTERVAL)
 
 
-def fetch_weights() -> Tuple[List[np.ndarray], int]:
-    """Download current global weights. Returns (weights, round_number)."""
+def fetch_weights() -> Tuple[List[np.ndarray], int, str, float]:
+    """Download current global weights. Returns (weights, round_number, algorithm, mu)."""
     resp = _get("/weights", timeout=10)
     resp.raise_for_status()
     data = resp.json()
@@ -73,7 +73,7 @@ def fetch_weights() -> Tuple[List[np.ndarray], int]:
         np.array(w, dtype=np.float32).reshape(s)
         for w, s in zip(data["weights"], data["shapes"])
     ]
-    return weights, data["round"]
+    return weights, data["round"], data.get("algorithm", "fedavg"), data.get("mu", 0.0)
 
 
 def submit(weights: List[np.ndarray], num_samples: int, loss: float, accuracy: float) -> None:

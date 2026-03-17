@@ -2,6 +2,8 @@ import logging
 import sys
 from pathlib import Path
 
+import torch
+
 from app.config import CLIENT_ID, DATA_PATH, NUM_CLASSES, SERVER_URL
 from app.comms import fetch_training_config, fetch_weights, register, submit, wait_for_next_round, wait_for_server_reachable, wait_for_round_open
 from app.data import load_data
@@ -39,16 +41,23 @@ def main() -> None:
     current_round = 0
 
     while True:
-        global_weights, server_round = fetch_weights()
-        log.info("Round %d — fetched global weights", server_round)
-        set_weights(model, global_weights)
+        global_weights_np, server_round, algorithm, mu = fetch_weights()
+        log.info("Round %d — fetched global weights (algorithm=%s  mu=%s)", server_round, algorithm, mu)
+        set_weights(model, global_weights_np)
+
+        # Snapshot global weights as frozen tensors for FedProx proximal term
+        global_weights_tensors = (
+            [torch.tensor(w, dtype=torch.float32) for w in global_weights_np]
+            if algorithm == "fedprox" else None
+        )
 
         # Evaluate the global model BEFORE local training (true global performance)
         global_loss, global_accuracy = evaluate(model, X_test, y_test)
         log.info("Round %d — global_loss=%.4f  global_accuracy=%.4f (before local training)",
                  server_round, global_loss, global_accuracy)
 
-        avg_loss = train(model, X_train, y_train, epochs=train_epochs, lr=train_lr)
+        avg_loss = train(model, X_train, y_train, epochs=train_epochs, lr=train_lr,
+                         algorithm=algorithm, mu=mu, global_weights=global_weights_tensors)
         log.info("Round %d — local_train_loss=%.4f", server_round, avg_loss)
 
         submit(get_weights(model), num_samples, global_loss, global_accuracy)

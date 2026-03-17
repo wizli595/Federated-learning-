@@ -24,6 +24,8 @@ export interface TrainingConfig {
   total_rounds: number;
   input_dim: number;
   num_classes: number;
+  algorithm?: string;
+  mu?: number;
 }
 
 export interface ClientSubmission {
@@ -54,7 +56,9 @@ export const startTraining  = (
   rounds: number,
   local_epochs: number,
   learning_rate: number,
-) => api.post("/start", { input_dim, num_classes, rounds, local_epochs, learning_rate }).then((r) => r.data);
+  algorithm: string = "fedavg",
+  mu: number = 0.1,
+) => api.post("/start", { input_dim, num_classes, rounds, local_epochs, learning_rate, algorithm, mu }).then((r) => r.data);
 
 export const stopTraining   = () =>
   api.post("/stop").then((r) => r.data);

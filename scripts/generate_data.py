@@ -36,7 +36,7 @@ log = logging.getLogger("generate-data")
 # ---------------------------------------------------------------------------
 parser = argparse.ArgumentParser(description="Generate synthetic FL dataset partitions")
 parser.add_argument("--clients",  type=int, default=3,   help="Number of client partitions")
-parser.add_argument("--samples",  type=int, default=300, help="Total samples (split across clients)")
+parser.add_argument("--samples",  type=int, default=600, help="Total samples (split across clients)")
 parser.add_argument("--features", type=int, default=20,  help="Number of input features")
 parser.add_argument("--classes",  type=int, default=2,   help="Number of output classes")
 parser.add_argument("--seed",     type=int, default=42)
@@ -59,8 +59,8 @@ X, y = make_classification(
     n_informative=2,             # only 2 truly informative features; 18 are noise
     n_redundant=max(1, args.features // 5),
     n_classes=args.classes,
-    class_sep=0.1,               # heavy class overlap — nearly indistinguishable
-    flip_y=0.20,                 # 20% label noise — 1 in 5 labels is wrong
+    class_sep=0.5,               # moderate class separation — learnable with overlap
+    flip_y=0.08,                 # 8% label noise — noisy but learnable
     random_state=args.seed,
 )
 
@@ -83,7 +83,7 @@ class1 = df[df["label"] == 1].sample(frac=1, random_state=args.seed).reset_index
 
 # Ratios: client-1 90/10, client-2 50/50, client-3 10/90
 # For >3 clients the remaining ones get 50/50
-ratios = {1: (0.9, 0.1), 2: (0.5, 0.5), 3: (0.1, 0.9)}
+ratios = {1: (0.7, 0.3), 2: (0.5, 0.5), 3: (0.3, 0.7)}
 
 c0_cursor = 0
 c1_cursor = 0

@@ -42,9 +42,11 @@ def get_weights():
             detail=f"Weights not available in state '{fl_state.state}'",
         )
     return JSONResponse(content={
-        "round":   fl_state.current_round,
-        "weights": [w.flatten().tolist() for w in fl_state.global_weights],
-        "shapes":  [list(w.shape) for w in fl_state.global_weights],
+        "round":     fl_state.current_round,
+        "weights":   [w.flatten().tolist() for w in fl_state.global_weights],
+        "shapes":    [list(w.shape) for w in fl_state.global_weights],
+        "algorithm": fl_state.algorithm,
+        "mu":        fl_state.mu,
     })
 
 

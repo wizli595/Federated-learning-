@@ -47,13 +47,15 @@ export default function TrainingConfigPanel({
   const [rounds,       setRounds]       = useState(10);
   const [localEpochs,  setLocalEpochs]  = useState(5);
   const [learningRate, setLearningRate] = useState(0.01);
+  const [algorithm,    setAlgorithm]    = useState<"fedavg" | "fedprox">("fedavg");
+  const [mu,           setMu]           = useState(0.1);
   const [starting,     setStarting]     = useState(false);
 
   const mismatch = inputDim !== RECOMMENDED_INPUT_DIM || numClasses !== RECOMMENDED_NUM_CLASSES;
 
   const handleStart = () => {
     setStarting(true);
-    toast.promise(startTraining(inputDim, numClasses, rounds, localEpochs, learningRate), {
+    toast.promise(startTraining(inputDim, numClasses, rounds, localEpochs, learningRate, algorithm, mu), {
       loading: "Starting training...",
       success: "Training started!",
       error:   "Failed to start training",
@@ -101,6 +103,24 @@ export default function TrainingConfigPanel({
               onChange={(e) => setLearningRate(Number(e.target.value))}
               className={inputCls(false)} />
           </Field>
+          <Field label="Algorithm">
+            <select
+              value={algorithm}
+              onChange={(e) => setAlgorithm(e.target.value as "fedavg" | "fedprox")}
+              className="w-28 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm
+                         text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="fedavg">FedAvg</option>
+              <option value="fedprox">FedProx</option>
+            </select>
+          </Field>
+          {algorithm === "fedprox" && (
+            <Field label="Mu (μ)" hint="proximal term strength — 0.01 to 1.0">
+              <input type="number" min={0} step={0.01} value={mu}
+                onChange={(e) => setMu(Number(e.target.value))}
+                className={inputCls(false)} />
+            </Field>
+          )}
         </div>
       </div>
 
