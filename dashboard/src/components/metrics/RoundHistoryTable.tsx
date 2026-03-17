@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { Download } from "lucide-react";
 import { type RoundMetric } from "../../services/api";
 import Delta from "./Delta";
 
@@ -56,6 +57,33 @@ export default function RoundHistoryTable({ metrics }: Props) {
 
   const tabs = ["all", ...derivedClientIds];
 
+  const handleExport = () => {
+    const fmt = (v: number | null | undefined, decimals: number) =>
+      v != null ? v.toFixed(decimals) : "—";
+    const fmtSigned = (v: number | null | undefined, decimals: number) =>
+      v != null ? (v >= 0 ? `+${v.toFixed(decimals)}` : v.toFixed(decimals)) : "—";
+
+    const header = "Round,Clients,Duration,Loss,Loss Delta,Accuracy,Acc Delta";
+    const rows = metrics.map((m) => [
+      m.round,
+      m.num_clients,
+      m.duration_seconds != null ? `${m.duration_seconds}s` : "—",
+      fmt(m.avg_loss, 4),
+      fmtSigned(m.loss_delta, 4),
+      m.avg_accuracy != null ? `${(m.avg_accuracy * 100).toFixed(2)}%` : "—",
+      fmtSigned(m.accuracy_delta, 4),
+    ].join(","));
+
+    const csv  = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = "fl_metrics.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // Reset to "all" if active tab no longer exists in derived list
   useEffect(() => {
     if (activeTab !== "all" && !derivedClientIds.includes(activeTab)) {
@@ -67,7 +95,20 @@ export default function RoundHistoryTable({ metrics }: Props) {
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
       {/* Header + tab bar */}
       <div className="px-5 py-4 border-b border-zinc-800">
-        <h2 className="text-sm font-medium text-zinc-300 mb-3">Round History</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-medium text-zinc-300">Round History</h2>
+          {activeTab === "all" && (
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700
+                         border border-zinc-700 text-zinc-300 text-xs font-medium rounded-lg
+                         transition-all duration-150 active:scale-95 cursor-pointer"
+            >
+              <Download size={11} />
+              Export CSV
+            </button>
+          )}
+        </div>
         <div className="flex items-center gap-1 flex-wrap">
           {tabs.map((tab) => (
             <button

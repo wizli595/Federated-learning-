@@ -45,6 +45,7 @@ export interface FLStatus {
   client_ids: string[];
   training_config: TrainingConfig | null;
   client_submissions: Record<string, ClientSubmission>;
+  stop_reason: "completed" | "converged" | "manual";
 }
 
 export const fetchStatus    = (): Promise<FLStatus> =>

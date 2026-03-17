@@ -3,7 +3,7 @@ server:
   port: 8080
 
 federation:
-  rounds: 10
+  rounds: 25
   min_clients: 2
   fraction_fit: 1.0          # fraction of clients used per round
   fraction_evaluate: 1.0

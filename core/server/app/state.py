@@ -29,6 +29,7 @@ class FLState:
         self.round_start_time: float     = 0.0
         self.algorithm: str              = "fedavg"
         self.mu: float                   = 0.1
+        self.stop_reason: str            = "completed"
         self.lock = asyncio.Lock()
 
     def reset(self) -> None:
@@ -46,6 +47,7 @@ class FLState:
         self.round_start_time = 0.0
         self.algorithm        = "fedavg"
         self.mu               = 0.1
+        self.stop_reason      = "completed"
 
     def soft_reset(self) -> None:
         """Pause — preserves global weights, metrics, and round info so training can resume."""

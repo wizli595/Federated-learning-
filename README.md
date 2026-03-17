@@ -129,3 +129,66 @@ pfa-fl/
 ## Quick Start
 
 See [`INSTRUCTIONS.md`](./INSTRUCTIONS.md) for the full step-by-step guide with Docker commands, log inspection, and troubleshooting.
+
+---
+
+## Experiments & Findings
+
+We ran 6 configurations to find the optimal
+training setup for this FL system.
+
+### Dataset
+
+- 600 samples split across 3 clients
+- 20 features (2 informative, 18 noise)
+- Binary classification (class 0 vs class 1)
+- Non-IID: each client has a skewed class distribution
+
+### Configurations Tested
+
+| #   | Algorithm     | LR    | Data Skew        | Best Acc | Oscillation | Notes                           |
+| --- | ------------- | ----- | ---------------- | -------- | ----------- | ------------------------------- |
+| 1   | FedAvg        | 0.01  | Extreme (90/10)  | 78.07%   | ±11%        | Fast learning, chaotic          |
+| 2   | FedAvg        | 0.001 | Extreme (90/10)  | 64.39%   | ±3%         | Stable but too slow             |
+| 3   | FedAvg        | 0.005 | Extreme (90/10)  | 78.16%   | ±13%        | Same ceiling, more chaos        |
+| 4   | FedProx μ=0.1 | 0.01  | Extreme (90/10)  | 76.32%   | ±12%        | No improvement over FedAvg      |
+| 5   | FedAvg        | 0.01  | Moderate (70/30) | 77.50%   | ±3%         | ✅ Best overall                 |
+| 6   | FedProx μ=0.1 | 0.01  | Moderate (70/30) | 74.17%   | ±4%         | Worse than FedAvg on clean data |
+
+### Key Finding
+
+**The data distribution matters more than the algorithm.**
+
+Fixing the non-IID skew from extreme (90/10) to moderate
+(70/30) improved oscillation from ±11% to ±3% — more than
+any algorithm or learning rate change.
+
+FedAvg with well-structured non-IID data outperforms
+FedProx with extreme non-IID data. FedProx adds a
+proximal term that prevents client drift, but when
+clients are learning genuinely opposite class
+distributions, the proximal term fights valid
+learning signals rather than correcting drift.
+
+### Recommended Config
+
+```yaml
+algorithm: FedAvg
+learning_rate: 0.01
+rounds: 25
+local_epochs: 5
+data_skew: 70/30 (moderate non-IID)
+```
+
+### Why FedProx Did Not Help Here
+
+FedProx is designed for system heterogeneity —
+slow clients, partial updates, dropped connections.
+It is not designed for extreme data heterogeneity.
+When client-1 has 90% class 0 and client-3 has
+90% class 1, they are not drifting — they are
+learning genuinely different things. The proximal
+term penalizes this valid learning and reduces
+overall model quality.
+
+---

@@ -40,3 +40,4 @@ class StatusResponse(BaseModel):
     client_ids: List[str]
     training_config: Optional[Dict] = None
     client_submissions: Dict[str, Dict] = {}
+    stop_reason: str = "completed"

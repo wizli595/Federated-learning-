@@ -25,7 +25,7 @@ def train(
     effective_lr     = lr     if lr     is not None else LR
 
     model.train()
-    optimizer = torch.optim.Adam(model.parameters(), lr=effective_lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=effective_lr, weight_decay=1e-4)
     criterion = nn.CrossEntropyLoss()
     loader = torch.utils.data.DataLoader(
         torch.utils.data.TensorDataset(X_train, y_train),

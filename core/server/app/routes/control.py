@@ -42,6 +42,7 @@ def get_status():
             }
             for cid, s in fl_state.submissions.items()
         },
+        stop_reason=fl_state.stop_reason,
     )
 
 
@@ -106,6 +107,7 @@ async def stop_training():
                 detail=f"Cannot stop: training is not active (state={fl_state.state})",
             )
         fl_state.stop_requested = True
+        fl_state.stop_reason    = "manual"
 
     log.info("Stop requested — training will finish after the current round.")
     return {"message": "Stop requested — will finish after this round"}

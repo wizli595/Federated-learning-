@@ -81,11 +81,28 @@ async def aggregate_and_advance(state: FLState) -> None:
         torch.save(state.model.state_dict(), OUTPUT_PATH)
         log.info("Checkpoint saved → %s", OUTPUT_PATH)
 
+        # Early stopping — halt if loss hasn't improved across the last 5 rounds
+        if len(state.metrics) >= 5:
+            recent_losses = [m["avg_loss"] for m in state.metrics[-5:] if m["avg_loss"] is not None]
+            if len(recent_losses) == 5:
+                improvement = max(recent_losses) - min(recent_losses)
+                if improvement < 0.005:
+                    log.info("Early stopping — loss converged (delta=%.5f < 0.005)", improvement)
+                    state.stop_requested = False
+                    state.stop_reason    = "converged"
+                    state.state = ServerState.FINISHED
+                    log.info("Training finished after round %d (early stop).", state.current_round)
+                    return
+
         # Advance or finish (honour stop_requested flag)
         if state.current_round >= state.total_rounds or state.stop_requested:
+            if state.stop_requested:
+                state.stop_reason = "manual"
+            else:
+                state.stop_reason = "completed"
             state.stop_requested = False
             state.state = ServerState.FINISHED
-            log.info("Training finished after round %d.", state.current_round)
+            log.info("Training finished after round %d (reason=%s).", state.current_round, state.stop_reason)
         else:
             state.current_round += 1
             state.submissions.clear()

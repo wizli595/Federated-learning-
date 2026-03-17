@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import { Activity, Users, BarChart2, RefreshCw, Square, Clock, RotateCcw, Download } from "lucide-react";
 
@@ -27,6 +28,23 @@ export default function Overview({ data, events, eta, clientJoinTimes }: Props) 
   const [stopping,   setStopping]   = useState(false);
   const [resetting,  setResetting]  = useState(false);
   const [showConfig, setShowConfig] = useState(false);
+
+  // Fire confetti once on the transition to "finished"
+  const prevStateRef = useRef(data.state);
+  useEffect(() => {
+    if (
+      (prevStateRef.current === "round_open" || prevStateRef.current === "aggregating") &&
+      data.state === "finished"
+    ) {
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"],
+      });
+    }
+    prevStateRef.current = data.state;
+  }, [data.state]);
 
   const isActive   = data.state === "round_open" || data.state === "aggregating";
   const isPaused   = data.state === "waiting" && data.current_round > 0;
@@ -86,6 +104,18 @@ export default function Overview({ data, events, eta, clientJoinTimes }: Props) 
             </div>
           )}
           <StatusBadge state={data.state} />
+          {data.state === "finished" && (() => {
+            const pill = {
+              converged: { label: "✓ Converged early",    cls: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" },
+              completed: { label: "✓ All rounds complete", cls: "bg-blue-500/10    border-blue-500/30    text-blue-400"    },
+              manual:    { label: "⏹ Stopped manually",   cls: "bg-zinc-700/50    border-zinc-600/50    text-zinc-400"    },
+            }[data.stop_reason] ?? { label: "✓ All rounds complete", cls: "bg-blue-500/10 border-blue-500/30 text-blue-400" };
+            return (
+              <span className={`px-2.5 py-1 text-xs font-medium rounded-lg border ${pill.cls}`}>
+                {pill.label}
+              </span>
+            );
+          })()}
           {data.state === "finished" && (
             <>
               <button
