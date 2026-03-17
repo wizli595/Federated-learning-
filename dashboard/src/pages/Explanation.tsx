@@ -30,6 +30,13 @@ const SECTIONS = [
     content: <FedAvg />,
   },
   {
+    id: "fedprox",
+    icon: GitMerge,
+    color: "text-violet-400",
+    title: "FedProx — Proximal Term Algorithm",
+    content: <FedProxSection />,
+  },
+  {
     id: "non-iid",
     icon: Shuffle,
     color: "text-amber-400",
@@ -70,6 +77,13 @@ const SECTIONS = [
     color: "text-pink-400",
     title: "Reading the Metrics",
     content: <MetricsGuide />,
+  },
+  {
+    id: "experiments",
+    icon: BarChart2,
+    color: "text-pink-400",
+    title: "Experiment Results",
+    content: <Experiments />,
   },
   {
     id: "glossary",
@@ -498,11 +512,12 @@ function MetricsGuide() {
   return (
     <>
       <p className="text-sm text-zinc-400 leading-relaxed">
-        The metrics shown in the dashboard are reported by clients{" "}
-        <span className="text-zinc-200">before local training</span> each round
-        — meaning they reflect how well the current{" "}
-        <span className="text-zinc-200">global model</span> performs on each
-        client's held-out test split, averaged across all clients.
+        The metrics are reported by clients as part of their{" "}
+        <span className="text-zinc-200">POST /submit</span> payload after local
+        training. Loss and accuracy reflect the{" "}
+        <span className="text-zinc-200">locally fine-tuned model</span>{" "}
+        evaluated on each client's held-out test split, then averaged across all
+        clients by the server.
       </p>
       <div className="space-y-3">
         {[
@@ -526,6 +541,10 @@ function MetricsGuide() {
             t: "Accuracy gain chart",
             d: "Bar chart of per-round accuracy improvement. Tall bars early = fast learning. Flat bars later = convergence or saturation near the noise floor.",
           },
+          {
+            t: "Early stopping",
+            d: "The server monitors loss across the last 10 rounds. If neither loss nor accuracy improves meaningfully (loss trend flat, accuracy gain < 2%), training stops automatically. Prevents wasted compute on runs that have already converged.",
+          },
         ].map(({ t, d }) => (
           <div key={t} className="flex gap-3">
             <div className="text-xs font-semibold text-zinc-300 w-40 shrink-0 pt-0.5 font-mono">
@@ -534,6 +553,110 @@ function MetricsGuide() {
             <p className="text-xs text-zinc-500 leading-relaxed">{d}</p>
           </div>
         ))}
+      </div>
+    </>
+  );
+}
+
+function FedProxSection() {
+  return (
+    <>
+      <p className="text-sm text-zinc-400 leading-relaxed">
+        <span className="text-zinc-200">FedProx</span> extends FedAvg by adding
+        a proximal term to each client's loss function that penalises large
+        deviations from the global model:
+      </p>
+      <div className="bg-zinc-800/80 border border-zinc-700/50 rounded-xl p-5 font-mono text-center">
+        <p className="text-zinc-200 text-sm tracking-wide">
+          <span className="text-blue-400">L</span>
+          {" = CrossEntropy(output, labels) + "}
+          <span className="text-violet-400">(μ / 2)</span>
+          {" × ‖"}
+          <span className="text-amber-400">
+            w<sub className="text-xs">local</sub>
+          </span>
+          {" − "}
+          <span className="text-emerald-400">
+            w<sub className="text-xs">global</sub>
+          </span>
+          {"‖²"}
+        </p>
+      </div>
+      <div className="space-y-3">
+        {[
+          {
+            t: "What μ controls",
+            c: "text-violet-400",
+            d: "μ = 0 reduces FedProx to plain FedAvg. Higher μ (0.1, 1.0) pulls local models closer to the global model each round, limiting drift.",
+          },
+          {
+            t: "When it helps",
+            c: "text-emerald-400",
+            d: "System heterogeneity, partial work (clients that can't complete all epochs), and slow clients. The proximal term makes partial updates safe to aggregate.",
+          },
+          {
+            t: "When it does NOT help",
+            c: "text-red-400",
+            d: "Extreme data heterogeneity — our finding. With 90/10 label skew the proximal term cannot overcome the fundamental conflict between client objectives.",
+          },
+          {
+            t: "Typical μ values",
+            c: "text-zinc-300",
+            d: "0.01, 0.1, 1.0. Start with μ = 0.1. Higher values improve stability but slow convergence speed.",
+          },
+        ].map(({ t, c, d }) => (
+          <div key={t} className="flex gap-3">
+            <div className={`text-xs font-semibold ${c} w-44 shrink-0 pt-0.5`}>
+              {t}
+            </div>
+            <p className="text-xs text-zinc-500 leading-relaxed">{d}</p>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function Experiments() {
+  const rows = [
+    { algo: "FedAvg",          lr: "0.01",  skew: "Extreme 90/10", acc: "78.07%", osc: "±11%" },
+    { algo: "FedAvg",          lr: "0.001", skew: "Extreme 90/10", acc: "64.39%", osc: "±3%"  },
+    { algo: "FedAvg",          lr: "0.005", skew: "Extreme 90/10", acc: "78.16%", osc: "±13%" },
+    { algo: "FedProx μ=0.1",   lr: "0.01",  skew: "Extreme 90/10", acc: "76.32%", osc: "±12%" },
+    { algo: "FedAvg ✅",        lr: "0.01",  skew: "Moderate 70/30", acc: "77.50%", osc: "±3%"  },
+    { algo: "FedProx μ=0.1",   lr: "0.01",  skew: "Moderate 70/30", acc: "74.17%", osc: "±4%"  },
+  ];
+  return (
+    <>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-zinc-700/60">
+              {["Algorithm", "LR", "Data Skew", "Best Acc", "Oscillation"].map((h) => (
+                <th key={h} className="text-left py-2 pr-4 text-zinc-400 font-semibold">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, i) => (
+              <tr key={i} className="border-b border-zinc-800/40">
+                <td className="py-2 pr-4 font-mono text-zinc-200">{r.algo}</td>
+                <td className="py-2 pr-4 text-zinc-400">{r.lr}</td>
+                <td className="py-2 pr-4 text-zinc-400">{r.skew}</td>
+                <td className="py-2 pr-4 text-emerald-400 font-semibold">{r.acc}</td>
+                <td className="py-2 text-amber-400">{r.osc}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="bg-zinc-800/60 border border-zinc-700/50 rounded-lg p-4">
+        <p className="text-xs text-zinc-300 font-semibold mb-1">Key finding</p>
+        <p className="text-xs text-zinc-400 leading-relaxed">
+          Data distribution matters more than algorithm choice. Reducing skew
+          from 90/10 to 70/30 improved oscillation from ±11% to ±3% — more
+          than any algorithm or learning rate change.
+        </p>
       </div>
     </>
   );

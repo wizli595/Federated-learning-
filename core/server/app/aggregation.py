@@ -81,13 +81,24 @@ async def aggregate_and_advance(state: FLState) -> None:
         torch.save(state.model.state_dict(), OUTPUT_PATH)
         log.info("Checkpoint saved → %s", OUTPUT_PATH)
 
-        # Early stopping — halt if loss hasn't improved across the last 5 rounds
-        if len(state.metrics) >= 5:
-            recent_losses = [m["avg_loss"] for m in state.metrics[-5:] if m["avg_loss"] is not None]
-            if len(recent_losses) == 5:
-                improvement = max(recent_losses) - min(recent_losses)
-                if improvement < 0.005:
-                    log.info("Early stopping — loss converged (delta=%.5f < 0.005)", improvement)
+        # Early stopping — no improvement in loss trend AND accuracy over last 10 rounds
+        if len(state.metrics) >= 10:
+            recent = [m["avg_loss"] for m in state.metrics[-10:] if m["avg_loss"] is not None]
+            if len(recent) == 10:
+                first_half_avg  = sum(recent[:5]) / 5
+                second_half_avg = sum(recent[5:]) / 5
+                loss_trend = second_half_avg - first_half_avg
+
+                recent_acc = [m["avg_accuracy"] for m in state.metrics[-10:]
+                              if m["avg_accuracy"] is not None]
+                acc_improvement = max(recent_acc) - min(recent_acc[:5])
+
+                if loss_trend > -0.01 and acc_improvement < 0.02:
+                    log.info(
+                        "Early stopping — no improvement in last 10 rounds "
+                        "(loss trend=%.4f, acc gain=%.4f)",
+                        loss_trend, acc_improvement,
+                    )
                     state.stop_requested = False
                     state.stop_reason    = "converged"
                     state.state = ServerState.FINISHED
