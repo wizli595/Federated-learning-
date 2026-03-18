@@ -109,6 +109,17 @@ def fetch_training_config() -> dict:
         return {}
 
 
+def post_log(client_id: str, level: str, msg: str) -> None:
+    try:
+        requests.post(
+            f"{SERVER_URL}/logs/client",
+            json={"client_id": client_id, "level": level, "msg": msg},
+            timeout=1,
+        )
+    except Exception:
+        pass  # never block training for a log failure
+
+
 def wait_for_next_round(current_round: int) -> str:
     """
     Poll /status until the next round opens, training finishes, or the server is paused.

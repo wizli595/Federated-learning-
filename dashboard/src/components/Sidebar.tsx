@@ -1,10 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, LineChart, Users, BookOpen, FileCode2, Wifi, WifiOff } from "lucide-react";
+import { LayoutDashboard, LineChart, Users, Terminal, BookOpen, FileCode2, Wifi, WifiOff } from "lucide-react";
 
 const NAV = [
   { to: "/",            label: "Overview",    icon: LayoutDashboard },
   { to: "/metrics",     label: "Metrics",     icon: LineChart        },
   { to: "/clients",     label: "Clients",     icon: Users            },
+  { to: "/logs",        label: "Logs",        icon: Terminal         },
 ];
 
 const NAV_BOTTOM = [

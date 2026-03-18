@@ -2,9 +2,11 @@ import logging
 import sys
 import time
 from pathlib import Path
+from typing import Optional
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 
 from ..config import MIN_CLIENTS, OUTPUT_PATH
 from ..schemas import StartRequest, StatusResponse
@@ -123,6 +125,40 @@ def download_model():
         media_type="application/octet-stream",
         filename="global_model.pt",
     )
+
+
+class ClientLogRequest(BaseModel):
+    client_id: str
+    level: str
+    msg: str
+
+
+@router.get("/logs", tags=["control"])
+def get_logs(
+    source: Optional[str] = Query(default=None),
+    limit: int = Query(default=200, le=1000),
+):
+    from ..main import log_buffer
+    entries = list(log_buffer)
+    if source:
+        entries = [e for e in entries if e["source"] == source]
+    return {"logs": entries[-limit:], "total": len(entries)}
+
+
+@router.post("/logs/client", tags=["control"])
+def post_client_log(body: ClientLogRequest):
+    try:
+        from ..main import log_buffer
+        from datetime import datetime
+        log_buffer.append({
+            "ts": datetime.utcnow().isoformat() + "Z",
+            "level": body.level,
+            "source": body.client_id,
+            "msg": body.msg,
+        })
+    except Exception:
+        pass
+    return {"ok": True}
 
 
 @router.post("/reset", tags=["control"])

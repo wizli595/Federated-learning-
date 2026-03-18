@@ -1,4 +1,6 @@
 import logging
+from collections import deque
+from datetime import datetime
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +11,24 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s — %(message)s",
 )
+
+log_buffer: deque = deque(maxlen=1000)
+
+
+class BufferHandler(logging.Handler):
+    def emit(self, record):
+        try:
+            log_buffer.append({
+                "ts": datetime.utcnow().isoformat() + "Z",
+                "level": record.levelname,
+                "source": "server",
+                "msg": self.format(record),
+            })
+        except Exception:
+            pass
+
+
+logging.getLogger().addHandler(BufferHandler())
 
 app = FastAPI(
     title="FL Server",
