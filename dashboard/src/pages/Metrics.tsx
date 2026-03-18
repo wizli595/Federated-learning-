@@ -1,6 +1,8 @@
 import { type FLStatus } from "../services/api";
-import MetricsCharts    from "../components/metrics/MetricsCharts";
-import RoundHistoryTable from "../components/metrics/RoundHistoryTable";
+import MetricsCharts          from "../components/metrics/MetricsCharts";
+import RoundHistoryTable       from "../components/metrics/RoundHistoryTable";
+import PerClientAccuracyChart  from "../components/metrics/PerClientAccuracyChart";
+import RoundTimeline           from "../components/metrics/RoundTimeline";
 
 export default function Metrics({ data }: { data: FLStatus }) {
   const { metrics, client_ids } = data;
@@ -39,6 +41,8 @@ export default function Metrics({ data }: { data: FLStatus }) {
       ) : (
         <>
           <MetricsCharts   metrics={metrics} enriched={enriched} />
+          <PerClientAccuracyChart metrics={metrics} />
+          <RoundTimeline metrics={metrics} />
           <RoundHistoryTable metrics={enriched} clientIds={client_ids} />
         </>
       )}
