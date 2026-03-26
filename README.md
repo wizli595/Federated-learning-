@@ -1,4 +1,4 @@
-# PFA-FL — Horizontal Federated Learning System
+# PFA-FL — Federated Learning System
 
 A production-structured **Federated Learning** system built from scratch — no Flower, no shortcuts. Three fully independent deployable units communicate exclusively over HTTP, implementing the FedAvg algorithm with a real training loop, REST API, and live monitoring dashboard.
 
