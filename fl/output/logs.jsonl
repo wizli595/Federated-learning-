@@ -1,0 +1,222 @@
+{"ts": "2026-03-31T10:56:16", "source": "server", "msg": "[server] starting | rounds=20 min_clients=2 port=8090"}
+{"ts": "2026-03-31T10:56:16", "source": "server", "msg": "INFO flwr 2026-03-31 10:56:16,355 | app.py:162 | Starting Flower server, config: ServerConfig(num_rounds=20, round_timeout=None)"}
+{"ts": "2026-03-31T10:56:16", "source": "server", "msg": "INFO flwr 2026-03-31 10:56:16,373 | app.py:175 | Flower ECE: gRPC server running (20 rounds), SSL is disabled"}
+{"ts": "2026-03-31T10:56:16", "source": "server", "msg": "INFO flwr 2026-03-31 10:56:16,373 | server.py:89 | Initializing global parameters"}
+{"ts": "2026-03-31T10:56:16", "source": "server", "msg": "INFO flwr 2026-03-31 10:56:16,373 | server.py:276 | Requesting initial parameters from one random client"}
+{"ts": "2026-03-31T10:56:19", "source": "alice", "msg": "[alice] loading data from /app/fl/data/alice/dataset.csv"}
+{"ts": "2026-03-31T10:56:19", "source": "alice", "msg": "[alice] train=640 test=160 spam=63.4%"}
+{"ts": "2026-03-31T10:56:19", "source": "alice", "msg": "INFO flwr 2026-03-31 10:56:19,535 | grpc.py:49 | Opened insecure gRPC connection (no certificates were passed)"}
+{"ts": "2026-03-31T10:56:19", "source": "alice", "msg": "DEBUG flwr 2026-03-31 10:56:19,537 | connection.py:42 | ChannelConnectivity.IDLE"}
+{"ts": "2026-03-31T10:56:19", "source": "alice", "msg": "DEBUG flwr 2026-03-31 10:56:19,542 | connection.py:42 | ChannelConnectivity.READY"}
+{"ts": "2026-03-31T10:56:19", "source": "server", "msg": "INFO flwr 2026-03-31 10:56:19,550 | server.py:280 | Received initial parameters from one random client"}
+{"ts": "2026-03-31T10:56:19", "source": "server", "msg": "INFO flwr 2026-03-31 10:56:19,550 | server.py:91 | Evaluating initial parameters"}
+{"ts": "2026-03-31T10:56:19", "source": "server", "msg": "INFO flwr 2026-03-31 10:56:19,550 | server.py:104 | FL starting"}
+{"ts": "2026-03-31T10:56:19", "source": "meriem", "msg": "[meriem] loading data from /app/fl/data/meriem/dataset.csv"}
+{"ts": "2026-03-31T10:56:19", "source": "meriem", "msg": "[meriem] train=640 test=160 spam=68.4%"}
+{"ts": "2026-03-31T10:56:19", "source": "meriem", "msg": "INFO flwr 2026-03-31 10:56:19,609 | grpc.py:49 | Opened insecure gRPC connection (no certificates were passed)"}
+{"ts": "2026-03-31T10:56:19", "source": "meriem", "msg": "DEBUG flwr 2026-03-31 10:56:19,613 | connection.py:42 | ChannelConnectivity.IDLE"}
+{"ts": "2026-03-31T10:56:19", "source": "meriem", "msg": "DEBUG flwr 2026-03-31 10:56:19,618 | connection.py:42 | ChannelConnectivity.CONNECTING"}
+{"ts": "2026-03-31T10:56:19", "source": "fdfff", "msg": "[fdfff] loading data from /app/fl/data/fdfff/dataset.csv"}
+{"ts": "2026-03-31T10:56:20", "source": "server", "msg": "[server] round 1/20 lr=0.005000 schedule=cosine"}
+{"ts": "2026-03-31T10:56:20", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:19,622 | server.py:222 | fit_round 1: strategy sampled 2 clients (out of 2)"}
+{"ts": "2026-03-31T10:56:20", "source": "meriem", "msg": "DEBUG flwr 2026-03-31 10:56:19,620 | connection.py:42 | ChannelConnectivity.READY"}
+{"ts": "2026-03-31T10:56:20", "source": "fdfff", "msg": "[fdfff] train=640 test=160 spam=67.0%"}
+{"ts": "2026-03-31T10:56:20", "source": "fdfff", "msg": "INFO flwr 2026-03-31 10:56:19,654 | grpc.py:49 | Opened insecure gRPC connection (no certificates were passed)"}
+{"ts": "2026-03-31T10:56:20", "source": "fdfff", "msg": "DEBUG flwr 2026-03-31 10:56:19,657 | connection.py:42 | ChannelConnectivity.IDLE"}
+{"ts": "2026-03-31T10:56:20", "source": "fdfff", "msg": "DEBUG flwr 2026-03-31 10:56:19,662 | connection.py:42 | ChannelConnectivity.READY"}
+{"ts": "2026-03-31T10:56:23", "source": "alice", "msg": "[alice] round done | loss=0.3038 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:56:23", "source": "meriem", "msg": "[meriem] round done | loss=0.1041 acc=0.9812 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:56:23", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:23,775 | server.py:236 | fit_round 1 received 2 results and 0 failures"}
+{"ts": "2026-03-31T10:56:23", "source": "server", "msg": "[server] model saved (ckpt r1) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:56:23", "source": "server", "msg": "[server] best model updated \u2192 round 1 acc=0.9531 \u2192 best_model.pt"}
+{"ts": "2026-03-31T10:56:23", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:23,811 | server.py:173 | evaluate_round 1: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:56:23", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:23,888 | server.py:187 | evaluate_round 1 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:56:23", "source": "server", "msg": "[server] round 2/20 lr=0.004969 schedule=cosine"}
+{"ts": "2026-03-31T10:56:23", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:23,889 | server.py:222 | fit_round 2: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:56:27", "source": "meriem", "msg": "[meriem] round done | loss=0.1279 acc=0.9750 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:56:27", "source": "alice", "msg": "[alice] round done | loss=0.3008 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:56:28", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2457 acc=0.9438 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:56:28", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:28,567 | server.py:236 | fit_round 2 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:56:28", "source": "server", "msg": "[server] model saved (ckpt r2) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:56:28", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:28,639 | server.py:173 | evaluate_round 2: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:56:28", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:28,695 | server.py:187 | evaluate_round 2 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:56:28", "source": "server", "msg": "[server] round 3/20 lr=0.004878 schedule=cosine"}
+{"ts": "2026-03-31T10:56:28", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:28,695 | server.py:222 | fit_round 3: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:56:43", "source": "meriem", "msg": "[meriem] round done | loss=0.1018 acc=0.9750 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:56:43", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2402 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:56:43", "source": "alice", "msg": "[alice] round done | loss=0.2918 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:56:43", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:43,925 | server.py:236 | fit_round 3 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:56:43", "source": "server", "msg": "[server] model saved (ckpt r3) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:56:44", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:43,950 | server.py:173 | evaluate_round 3: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:56:44", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:44,029 | server.py:187 | evaluate_round 3 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:56:44", "source": "server", "msg": "[server] round 4/20 lr=0.004729 schedule=cosine"}
+{"ts": "2026-03-31T10:56:44", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:56:44,029 | server.py:222 | fit_round 4: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:57:02", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2489 acc=0.9438 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:57:02", "source": "meriem", "msg": "[meriem] round done | loss=0.1206 acc=0.9688 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:57:02", "source": "alice", "msg": "[alice] round done | loss=0.3141 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:57:02", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:02,404 | server.py:236 | fit_round 4 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:57:02", "source": "server", "msg": "[server] model saved (ckpt r4) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:57:02", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:02,430 | server.py:173 | evaluate_round 4: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:57:02", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:02,512 | server.py:187 | evaluate_round 4 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:57:02", "source": "server", "msg": "[server] round 5/20 lr=0.004526 schedule=cosine"}
+{"ts": "2026-03-31T10:57:02", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:02,512 | server.py:222 | fit_round 5: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:57:20", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2573 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:57:20", "source": "alice", "msg": "[alice] round done | loss=0.2988 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:57:21", "source": "meriem", "msg": "[meriem] round done | loss=0.1067 acc=0.9750 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:57:21", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:21,090 | server.py:236 | fit_round 5 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:57:21", "source": "server", "msg": "[server] model saved (ckpt r5) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:57:21", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:21,120 | server.py:173 | evaluate_round 5: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:57:21", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:21,195 | server.py:187 | evaluate_round 5 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:57:21", "source": "server", "msg": "[server] round 6/20 lr=0.004274 schedule=cosine"}
+{"ts": "2026-03-31T10:57:21", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:21,196 | server.py:222 | fit_round 6: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:57:39", "source": "alice", "msg": "[alice] round done | loss=0.3237 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:57:39", "source": "meriem", "msg": "[meriem] round done | loss=0.1328 acc=0.9688 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:57:39", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2917 acc=0.9312 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:57:39", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:39,586 | server.py:236 | fit_round 6 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:57:39", "source": "server", "msg": "[server] model saved (ckpt r6) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:57:39", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:39,619 | server.py:173 | evaluate_round 6: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:57:39", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:39,724 | server.py:187 | evaluate_round 6 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:57:39", "source": "server", "msg": "[server] round 7/20 lr=0.003981 schedule=cosine"}
+{"ts": "2026-03-31T10:57:39", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:39,724 | server.py:222 | fit_round 7: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:57:57", "source": "alice", "msg": "[alice] round done | loss=0.2988 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:57:57", "source": "meriem", "msg": "[meriem] round done | loss=0.1216 acc=0.9750 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:57:57", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2629 acc=0.9438 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:57:58", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:58,008 | server.py:236 | fit_round 7 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:57:58", "source": "server", "msg": "[server] model saved (ckpt r7) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:57:58", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:58,040 | server.py:173 | evaluate_round 7: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:57:58", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:58,111 | server.py:187 | evaluate_round 7 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:57:58", "source": "server", "msg": "[server] round 8/20 lr=0.003654 schedule=cosine"}
+{"ts": "2026-03-31T10:57:58", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:57:58,112 | server.py:222 | fit_round 8: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:58:17", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2707 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:58:17", "source": "alice", "msg": "[alice] round done | loss=0.3187 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:58:17", "source": "meriem", "msg": "[meriem] round done | loss=0.1012 acc=0.9812 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:58:17", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:17,790 | server.py:236 | fit_round 8 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:58:17", "source": "server", "msg": "[server] model saved (ckpt r8) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:58:17", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:17,815 | server.py:173 | evaluate_round 8: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:58:17", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:17,918 | server.py:187 | evaluate_round 8 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:58:17", "source": "server", "msg": "[server] round 9/20 lr=0.003302 schedule=cosine"}
+{"ts": "2026-03-31T10:58:17", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:17,920 | server.py:222 | fit_round 9: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:58:35", "source": "alice", "msg": "[alice] round done | loss=0.3060 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:58:35", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2626 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:58:35", "source": "meriem", "msg": "[meriem] round done | loss=0.1067 acc=0.9812 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:58:35", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:35,692 | server.py:236 | fit_round 9 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:58:35", "source": "server", "msg": "[server] model saved (ckpt r9) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:58:35", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:35,714 | server.py:173 | evaluate_round 9: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:58:35", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:35,797 | server.py:187 | evaluate_round 9 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:58:35", "source": "server", "msg": "[server] round 10/20 lr=0.002936 schedule=cosine"}
+{"ts": "2026-03-31T10:58:35", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:35,797 | server.py:222 | fit_round 10: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:58:48", "source": "alice", "msg": "[alice] round done | loss=0.3258 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:58:49", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2483 acc=0.9438 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:58:49", "source": "meriem", "msg": "[meriem] round done | loss=0.1036 acc=0.9812 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:58:49", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:49,233 | server.py:236 | fit_round 10 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:58:49", "source": "server", "msg": "[server] model saved (ckpt r10) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:58:49", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:49,253 | server.py:173 | evaluate_round 10: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:58:49", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:49,307 | server.py:187 | evaluate_round 10 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:58:49", "source": "server", "msg": "[server] round 11/20 lr=0.002564 schedule=cosine"}
+{"ts": "2026-03-31T10:58:49", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:58:49,307 | server.py:222 | fit_round 11: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:59:13", "source": "alice", "msg": "[alice] round done | loss=0.3376 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:59:13", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2562 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:59:13", "source": "meriem", "msg": "[meriem] round done | loss=0.1278 acc=0.9688 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:59:13", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:13,583 | server.py:236 | fit_round 11 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:59:13", "source": "server", "msg": "[server] model saved (ckpt r11) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:59:13", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:13,605 | server.py:173 | evaluate_round 11: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:59:13", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:13,656 | server.py:187 | evaluate_round 11 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:59:13", "source": "server", "msg": "[server] round 12/20 lr=0.002198 schedule=cosine"}
+{"ts": "2026-03-31T10:59:13", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:13,657 | server.py:222 | fit_round 12: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:59:28", "source": "alice", "msg": "[alice] round done | loss=0.3498 acc=0.9125 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:59:28", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2586 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:59:28", "source": "meriem", "msg": "[meriem] round done | loss=0.1117 acc=0.9750 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:59:28", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:28,549 | server.py:236 | fit_round 12 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:59:28", "source": "server", "msg": "[server] model saved (ckpt r12) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:59:28", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:28,574 | server.py:173 | evaluate_round 12: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:59:28", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:28,639 | server.py:187 | evaluate_round 12 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:59:28", "source": "server", "msg": "[server] round 13/20 lr=0.001846 schedule=cosine"}
+{"ts": "2026-03-31T10:59:28", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:28,640 | server.py:222 | fit_round 13: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:59:43", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2435 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:59:44", "source": "meriem", "msg": "[meriem] round done | loss=0.1237 acc=0.9688 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:59:44", "source": "alice", "msg": "[alice] round done | loss=0.3378 acc=0.9125 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:59:44", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:44,040 | server.py:236 | fit_round 13 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:59:44", "source": "server", "msg": "[server] model saved (ckpt r13) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:59:44", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:44,060 | server.py:173 | evaluate_round 13: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:59:44", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:44,108 | server.py:187 | evaluate_round 13 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:59:44", "source": "server", "msg": "[server] round 14/20 lr=0.001519 schedule=cosine"}
+{"ts": "2026-03-31T10:59:44", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:44,108 | server.py:222 | fit_round 14: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:59:56", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2679 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T10:59:57", "source": "alice", "msg": "[alice] round done | loss=0.3322 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T10:59:57", "source": "meriem", "msg": "[meriem] round done | loss=0.1380 acc=0.9688 spam_rate=0.9908"}
+{"ts": "2026-03-31T10:59:57", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:57,281 | server.py:236 | fit_round 14 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:59:57", "source": "server", "msg": "[server] model saved (ckpt r14) \u2192 global_model.pt"}
+{"ts": "2026-03-31T10:59:57", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:57,302 | server.py:173 | evaluate_round 14: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T10:59:57", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:57,384 | server.py:187 | evaluate_round 14 received 3 results and 0 failures"}
+{"ts": "2026-03-31T10:59:57", "source": "server", "msg": "[server] round 15/20 lr=0.001226 schedule=cosine"}
+{"ts": "2026-03-31T10:59:57", "source": "server", "msg": "DEBUG flwr 2026-03-31 10:59:57,385 | server.py:222 | fit_round 15: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:00:12", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2610 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T11:00:12", "source": "alice", "msg": "[alice] round done | loss=0.3430 acc=0.9187 spam_rate=0.9703"}
+{"ts": "2026-03-31T11:00:12", "source": "meriem", "msg": "[meriem] round done | loss=0.1299 acc=0.9688 spam_rate=0.9908"}
+{"ts": "2026-03-31T11:00:12", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:12,467 | server.py:236 | fit_round 15 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:00:12", "source": "server", "msg": "[server] model saved (ckpt r15) \u2192 global_model.pt"}
+{"ts": "2026-03-31T11:00:12", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:12,487 | server.py:173 | evaluate_round 15: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:00:12", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:12,572 | server.py:187 | evaluate_round 15 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:00:12", "source": "server", "msg": "[server] round 16/20 lr=0.000974 schedule=cosine"}
+{"ts": "2026-03-31T11:00:12", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:12,572 | server.py:222 | fit_round 16: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:00:33", "source": "alice", "msg": "[alice] round done | loss=0.3383 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T11:00:33", "source": "meriem", "msg": "[meriem] round done | loss=0.1252 acc=0.9688 spam_rate=0.9908"}
+{"ts": "2026-03-31T11:00:33", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2769 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T11:00:33", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:33,351 | server.py:236 | fit_round 16 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:00:33", "source": "server", "msg": "[server] model saved (ckpt r16) \u2192 global_model.pt"}
+{"ts": "2026-03-31T11:00:33", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:33,373 | server.py:173 | evaluate_round 16: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:00:33", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:33,445 | server.py:187 | evaluate_round 16 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:00:33", "source": "server", "msg": "[server] round 17/20 lr=0.000771 schedule=cosine"}
+{"ts": "2026-03-31T11:00:33", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:33,445 | server.py:222 | fit_round 17: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:00:47", "source": "meriem", "msg": "[meriem] round done | loss=0.1230 acc=0.9750 spam_rate=0.9908"}
+{"ts": "2026-03-31T11:00:48", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2752 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T11:00:48", "source": "alice", "msg": "[alice] round done | loss=0.3321 acc=0.9125 spam_rate=0.9703"}
+{"ts": "2026-03-31T11:00:48", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:48,213 | server.py:236 | fit_round 17 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:00:48", "source": "server", "msg": "[server] model saved (ckpt r17) \u2192 global_model.pt"}
+{"ts": "2026-03-31T11:00:48", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:48,239 | server.py:173 | evaluate_round 17: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:00:48", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:48,302 | server.py:187 | evaluate_round 17 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:00:48", "source": "server", "msg": "[server] round 18/20 lr=0.000622 schedule=cosine"}
+{"ts": "2026-03-31T11:00:48", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:00:48,302 | server.py:222 | fit_round 18: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:01:03", "source": "alice", "msg": "[alice] round done | loss=0.3443 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T11:01:03", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2684 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T11:01:03", "source": "meriem", "msg": "[meriem] round done | loss=0.1263 acc=0.9688 spam_rate=0.9908"}
+{"ts": "2026-03-31T11:01:03", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:03,512 | server.py:236 | fit_round 18 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:01:03", "source": "server", "msg": "[server] model saved (ckpt r18) \u2192 global_model.pt"}
+{"ts": "2026-03-31T11:01:03", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:03,537 | server.py:173 | evaluate_round 18: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:01:03", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:03,598 | server.py:187 | evaluate_round 18 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:01:03", "source": "server", "msg": "[server] round 19/20 lr=0.000531 schedule=cosine"}
+{"ts": "2026-03-31T11:01:03", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:03,599 | server.py:222 | fit_round 19: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:01:17", "source": "alice", "msg": "[alice] round done | loss=0.3417 acc=0.9187 spam_rate=0.9703"}
+{"ts": "2026-03-31T11:01:18", "source": "meriem", "msg": "[meriem] round done | loss=0.1267 acc=0.9688 spam_rate=0.9908"}
+{"ts": "2026-03-31T11:01:18", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2790 acc=0.9375 spam_rate=1.0000"}
+{"ts": "2026-03-31T11:01:18", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:18,475 | server.py:236 | fit_round 19 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:01:18", "source": "server", "msg": "[server] model saved (ckpt r19) \u2192 global_model.pt"}
+{"ts": "2026-03-31T11:01:18", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:18,498 | server.py:173 | evaluate_round 19: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:01:18", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:18,560 | server.py:187 | evaluate_round 19 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:01:18", "source": "server", "msg": "[server] round 20/20 lr=0.000500 schedule=cosine"}
+{"ts": "2026-03-31T11:01:18", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:18,560 | server.py:222 | fit_round 20: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:01:34", "source": "alice", "msg": "[alice] round done | loss=0.3413 acc=0.9250 spam_rate=0.9703"}
+{"ts": "2026-03-31T11:01:34", "source": "fdfff", "msg": "[fdfff] round done | loss=0.2837 acc=0.9312 spam_rate=1.0000"}
+{"ts": "2026-03-31T11:01:34", "source": "meriem", "msg": "[meriem] round done | loss=0.1198 acc=0.9750 spam_rate=0.9908"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:34,486 | server.py:236 | fit_round 20 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "[server] model saved (final) \u2192 global_model.pt"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:34,517 | server.py:173 | evaluate_round 20: strategy sampled 3 clients (out of 3)"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "DEBUG flwr 2026-03-31 11:01:34,582 | server.py:187 | evaluate_round 20 received 3 results and 0 failures"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "INFO flwr 2026-03-31 11:01:34,583 | server.py:153 | FL finished in 315.05802806299835"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "INFO flwr 2026-03-31 11:01:34,583 | app.py:225 | app_fit: losses_distributed [(1, 0.2328860064347585), (2, 0.20980830490589142), (3, 0.20207145810127258), (4, 0.20692079265912375), (5, 0.20407982667287192), (6, 0.22311852872371674), (7, 0.21006495505571365), (8, 0.2187074969212214), (9, 0.21233615279197693), (10, 0.2121378779411316), (11, 0.21971189230680466), (12, 0.22390087942282358), (13, 0.22037139038244882), (14, 0.22427318741877875), (15, 0.2240284408132235), (16, 0.21672299255927405), (17, 0.22151679545640945), (18, 0.22382005800803503), (19, 0.22633436818917593), (20, 0.22847709556420645)]"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "INFO flwr 2026-03-31 11:01:34,583 | app.py:226 | app_fit: metrics_distributed_fit {}"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "INFO flwr 2026-03-31 11:01:34,583 | app.py:227 | app_fit: metrics_distributed {}"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "INFO flwr 2026-03-31 11:01:34,583 | app.py:228 | app_fit: losses_centralized []"}
+{"ts": "2026-03-31T11:01:34", "source": "server", "msg": "INFO flwr 2026-03-31 11:01:34,583 | app.py:229 | app_fit: metrics_centralized {}"}
+{"ts": "2026-03-31T11:01:34", "source": "meriem", "msg": "DEBUG flwr 2026-03-31 11:01:34,594 | connection.py:139 | gRPC channel closed"}
+{"ts": "2026-03-31T11:01:34", "source": "meriem", "msg": "INFO flwr 2026-03-31 11:01:34,595 | app.py:215 | Disconnect and shut down"}
+{"ts": "2026-03-31T11:01:34", "source": "alice", "msg": "DEBUG flwr 2026-03-31 11:01:34,598 | connection.py:139 | gRPC channel closed"}
+{"ts": "2026-03-31T11:01:34", "source": "alice", "msg": "INFO flwr 2026-03-31 11:01:34,598 | app.py:215 | Disconnect and shut down"}
+{"ts": "2026-03-31T11:01:34", "source": "fdfff", "msg": "DEBUG flwr 2026-03-31 11:01:34,599 | connection.py:139 | gRPC channel closed"}
+{"ts": "2026-03-31T11:01:35", "source": "fdfff", "msg": "INFO flwr 2026-03-31 11:01:34,601 | app.py:215 | Disconnect and shut down"}
+{"ts": "2026-03-31T11:01:35", "source": "controller", "msg": "distributing best checkpoint (best_model.pt)"}
+{"ts": "2026-03-31T11:01:36", "source": "controller", "msg": "model (best checkpoint) distributed \u2192 alice"}
+{"ts": "2026-03-31T11:01:36", "source": "controller", "msg": "model (best checkpoint) distributed \u2192 fdfff"}
+{"ts": "2026-03-31T11:01:36", "source": "controller", "msg": "model (best checkpoint) distributed \u2192 meriem"}
+{"ts": "2026-03-31T11:01:36", "source": "controller", "msg": "Training complete \u2014 model distributed to all clients"}
+{"ts": "2026-03-31T11:01:36", "source": "controller", "msg": "Run saved to experiment history"}

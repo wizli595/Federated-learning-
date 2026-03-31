@@ -1,0 +1,22 @@
+# Python environments - never copy venvs into the image
+**/.venv/
+**/venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Runtime data - mounted as volumes at runtime
+fl/data/
+fl/output/
+
+# Frontend - not needed in controller image
+dashboard/
+dashboard/node_modules/
+
+# Git
+.git/
+.gitignore
+
+# Misc
+*.md
+error.txt

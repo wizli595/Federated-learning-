@@ -1,0 +1,24 @@
+services:
+  controller:
+    build:
+      context: ..
+      dockerfile: controller/Dockerfile
+    container_name: fl-controller
+    ports:
+      - "8080:8080"
+    volumes:
+      # Runtime data/model files shared between host Flower processes and container
+      - ../fl/data:/app/fl/data
+      - ../fl/output:/app/fl/output
+      # Client configs persist across rebuilds
+      - ./app/clients:/app/controller/app/clients
+      # Experiments DB persists across rebuilds
+      - ./app/experiments.db:/app/controller/app/experiments.db
+      # Scripts + FL code mounted — changes apply without rebuilding Docker
+      - ../scripts:/app/scripts
+      - ../fl/shared:/app/fl/shared
+      - ../fl/client:/app/fl/client
+      - ../fl/server:/app/fl/server
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
