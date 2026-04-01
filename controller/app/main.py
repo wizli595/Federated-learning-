@@ -2,23 +2,40 @@
 main.py — Controller FastAPI application.
 """
 
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 
 from . import db
-from .routes import clients, data, training, inference, experiments
-from .services import flower
+from .routes import clients, data, training, inference, experiments, auth
+from .services import flower, kafka_bridge
+
+# ── Auth middleware ────────────────────────────────────────────────────────────
+_PUBLIC_PATHS = {"/health", "/auth/login"}
+
+class AuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path in _PUBLIC_PATHS:
+            return await call_next(request)
+        token = request.headers.get("Authorization", "").removeprefix("Bearer ").strip()
+        if not token or not auth.verify_token(token):
+            return JSONResponse({"detail": "Unauthorized"}, status_code=401)
+        return await call_next(request)
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     db.init_db()
-    # If the container restarted while training was running, reset stale status
-    # so the Start button appears immediately instead of being stuck on "training"
     _reset_stale_training()
+    # Background Kafka consumer — no-ops gracefully if Kafka is absent
+    _kafka_task = asyncio.create_task(kafka_bridge.start_consumer())
     yield
+    _kafka_task.cancel()
 
 
 def _reset_stale_training() -> None:
@@ -39,6 +56,7 @@ def _reset_stale_training() -> None:
 
 app = FastAPI(title="FL Email Spam — Controller", version="2.0.0", lifespan=lifespan)
 
+app.add_middleware(AuthMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -46,6 +64,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(clients.router)
 app.include_router(data.router)
 app.include_router(training.router)

@@ -14,6 +14,7 @@ from typing import Dict, List
 
 from ..state import training
 from .. import db
+from . import kafka_bridge
 
 ROOT     = Path(__file__).parent.parent.parent.parent
 FL_DIR   = ROOT / "fl"
@@ -89,6 +90,15 @@ async def start(req, clients: List[Dict]) -> None:
     training.running = True
     asyncio.create_task(_watch_and_distribute())
 
+    # Notify Worker: how many clients to expect per round
+    kafka_bridge.publish_status(
+        status        = "training",
+        current_round = 0,
+        total_rounds  = req.rounds,
+        num_clients   = len(clients),
+        message       = "training started",
+    )
+
 
 # ── Stop ───────────────────────────────────────────────────────────────────────
 
@@ -109,6 +119,7 @@ async def stop() -> None:
     training.server_process   = None
 
     _append_log("controller", "Training stopped by user")
+    kafka_bridge.publish_status(status="idle", message="stopped by user")
 
     if METRICS.exists():
         try:
@@ -158,6 +169,7 @@ async def _distribute_model() -> None:
     _append_log("controller", f"distributing {label} ({src.name})")
 
     clients_dir = ROOT / "controller" / "app" / "clients"
+    client_ids: List[str] = []
     for path in clients_dir.glob("*.json"):
         with open(path) as f:
             cid = json.load(f)["id"]
@@ -167,6 +179,42 @@ async def _distribute_model() -> None:
         msg = f"model ({label}) distributed → {cid}"
         print(f"[controller] {msg}", flush=True)
         _append_log("controller", msg)
+        client_ids.append(cid)
+
+    # Per-client fine-tuning: adapt the global model to each client's local data
+    finetune_epochs = int((training.config or {}).get("finetune_epochs", 0))
+    if finetune_epochs > 0 and client_ids:
+        await _finetune_clients(client_ids, finetune_epochs)
+
+
+async def _finetune_clients(client_ids: List[str], epochs: int) -> None:
+    """Spawn one finetune.py subprocess per client; run all in parallel."""
+    _append_log(
+        "controller",
+        f"personalizing {len(client_ids)} client(s) — {epochs} fine-tune epoch(s) each…",
+    )
+
+    async def _one(cid: str) -> None:
+        model_path = DATA_DIR / cid / "model.pt"
+        data_path  = DATA_DIR / cid / "dataset.csv"
+        if not data_path.exists() or not model_path.exists():
+            _append_log("controller", f"[{cid}] skipping fine-tune — missing data or model")
+            return
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable, str(FL_DIR / "client" / "finetune.py"),
+            "--client-id",  cid,
+            "--data-path",  str(data_path),
+            "--model-path", str(model_path),
+            "--epochs",     str(epochs),
+            "--lr",         "0.001",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+        )
+        await _drain_stdout(proc, cid)
+        await proc.wait()
+
+    await asyncio.gather(*[_one(cid) for cid in client_ids])
+    _append_log("controller", "personalization complete — all client models updated")
 
 
 def _finalise_run() -> None:
@@ -177,13 +225,16 @@ def _finalise_run() -> None:
     with open(METRICS) as f:
         metrics = json.load(f)
 
-    metrics["model_distributed"] = True
-    metrics["finished_at"]       = time.strftime("%Y-%m-%dT%H:%M:%S")
+    finetune_epochs = int((training.config or {}).get("finetune_epochs", 0))
+    metrics["model_distributed"]   = True
+    metrics["finetuning_complete"] = finetune_epochs > 0
+    metrics["finished_at"]         = time.strftime("%Y-%m-%dT%H:%M:%S")
 
     with open(METRICS, "w") as f:
         json.dump(metrics, f, indent=2)
 
     _append_log("controller", "Training complete — model distributed to all clients")
+    kafka_bridge.publish_status(status="finished", message="model distributed")
 
     if training.config:
         clients_dir = ROOT / "controller" / "app" / "clients"

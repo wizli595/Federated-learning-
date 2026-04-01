@@ -13,9 +13,10 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from shared.model import build_model, get_weights, set_weights, num_trainable, INPUT_DIM, NUM_CLASSES
-from client.data    import load_data
-from client.trainer import train, evaluate
-from client.privacy import privatize_weights
+from client.data             import load_data
+from client.trainer          import train, evaluate
+from client.privacy          import privatize_weights
+from client.kafka_publisher  import publish_weights as kafka_publish
 
 
 class EmailSpamClient(fl.client.NumPyClient):
@@ -56,7 +57,7 @@ class EmailSpamClient(fl.client.NumPyClient):
             global_params=global_params,
         )
 
-        loss, acc, spam_rate = evaluate(self.model, self.X_test, self.y_test)
+        loss, acc, spam_rate, tp, fp, tn, fn = evaluate(self.model, self.X_test, self.y_test)
         all_weights = get_weights(self.model)
         # Delta-based DP: clip/noise the weight UPDATE, not absolute weights
         # This gives ~10x better SNR vs absolute-weight clipping (see privacy.py)
@@ -70,23 +71,41 @@ class EmailSpamClient(fl.client.NumPyClient):
 
         print(
             f"[{self.client_id}] round done | "
-            f"loss={loss:.4f} acc={acc:.4f} spam_rate={spam_rate:.4f}",
+            f"loss={loss:.4f} acc={acc:.4f} spam_rate={spam_rate:.4f} "
+            f"tp={tp} fp={fp} tn={tn} fn={fn}",
             flush=True,
         )
+
+        # ── Kafka path (parallel to Flower gRPC, best-effort) ─────────────────
+        round_num = int(config.get("server_round", 0))
+        kafka_publish(
+            client_id   = self.client_id,
+            round_num   = round_num,
+            num_samples = len(self.X_train),
+            weights     = weights,
+            loss        = loss,
+            accuracy    = acc,
+            spam_rate   = spam_rate,
+            tp=tp, fp=fp, tn=tn, fn=fn,
+        )
+
+        # ── Flower gRPC path (unchanged) ──────────────────────────────────────
         return weights, len(self.X_train), {
             "client_id": self.client_id,
             "loss":      loss,
             "accuracy":  acc,
             "spam_rate": spam_rate,
+            "tp": tp, "fp": fp, "tn": tn, "fn": fn,
         }
 
     def evaluate(self, parameters: List[np.ndarray], config: Dict) -> Tuple:
         set_weights(self.model, parameters)
-        loss, acc, spam_rate = evaluate(self.model, self.X_test, self.y_test)
+        loss, acc, spam_rate, tp, fp, tn, fn = evaluate(self.model, self.X_test, self.y_test)
         return loss, len(self.X_test), {
             "client_id": self.client_id,
             "accuracy":  acc,
             "spam_rate": spam_rate,
+            "tp": tp, "fp": fp, "tn": tn, "fn": fn,
         }
 
 

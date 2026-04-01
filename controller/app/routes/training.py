@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from ..services import flower
+from ..services import flower, kafka_bridge
 from ..state import training
 
 router = APIRouter(prefix="/training", tags=["training"])
@@ -30,7 +30,8 @@ class StartTrainingRequest(BaseModel):
     noise_mult: float    = 0.01
     min_clients: int     = 2
     port: int            = 8090
-    lr_schedule: str     = "none"   # "none" | "cosine" | "step"
+    lr_schedule: str     = "none"      # "none" | "cosine" | "step"
+    finetune_epochs: int = 3           # local fine-tune epochs after distribution; 0 = disabled
 
 
 def _load_clients() -> List[Dict]:
@@ -70,6 +71,8 @@ async def stop_training():
 @router.get("/status")
 def training_status():
     data = flower.read_metrics()
+    # Overlay any rounds received from the Worker via Kafka (authoritative source)
+    data = kafka_bridge.merge_kafka_into(data)
     data["config"] = training.config
     return data
 
@@ -122,6 +125,41 @@ async def reset_training():
     training.config = None
 
     return {"message": "reset complete", "removed": removed}
+
+
+@router.get("/kafka-stream")
+async def kafka_metric_stream(request: Request):
+    """
+    SSE endpoint — pushes Worker-aggregated round metrics as they arrive via Kafka.
+    The dashboard subscribes here to get real-time updates without polling.
+
+    Each event is a JSON object matching the RoundMetric schema with an extra
+    'source': 'kafka' field so the dashboard can badge Kafka-sourced rounds.
+    """
+    q = kafka_bridge.subscribe_metrics()
+
+    async def generator():
+        try:
+            while True:
+                if await request.is_disconnected():
+                    break
+                try:
+                    data = await asyncio.wait_for(q.get(), timeout=15.0)
+                    yield f"data: {json.dumps(data)}\n\n"
+                except asyncio.TimeoutError:
+                    yield ": heartbeat\n\n"   # keep connection alive
+        finally:
+            kafka_bridge.unsubscribe_metrics(q)
+
+    return StreamingResponse(
+        generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control":    "no-cache",
+            "Connection":       "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.get("/stream")

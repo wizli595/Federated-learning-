@@ -1,62 +1,52 @@
-# PFA-FL — Federated Learning System
+# PFA-FL — Federated Learning System for Email Spam Detection
 
-A production-structured **Federated Learning** system built from scratch — no Flower, no shortcuts. Three fully independent deployable units communicate exclusively over HTTP, implementing the FedAvg algorithm with a real training loop, REST API, and live monitoring dashboard.
+A production-structured **Horizontal Federated Learning** system for email spam detection. Clients train locally on private email data; only DP-noised model weights are shared. Model updates flow through **Kafka** and are aggregated via **HDFS**-backed FedAvg in a dedicated Worker service.
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        CORE  :8080                          │
-│                                                             │
-│   ┌─────────────────────────────────────────────────────┐   │
-│   │              FL Server  (FastAPI)                   │   │
-│   │                                                     │   │
-│   │  POST /start     →  initialise model, open round 1 │   │
-│   │  POST /register  →  client registers itself         │   │
-│   │  GET  /weights   →  broadcast global weights        │   │
-│   │  POST /submit    →  receive local weights           │   │
-│   │  GET  /status    →  round state + metrics history   │   │
-│   └─────────────────────────────────────────────────────┘   │
-│              ▲  weights (HTTP/JSON)  ▲  status poll         │
-└──────────────┼──────────────────────┼─────────────────────┘
-               │                      │
-   ┌───────────┴──────────┐  ┌────────┴────────┐
-   │      CLIENTS         │  │    DASHBOARD    │
-   │                      │  │   Vite + React  │
-   │  client-1  (train)   │  │   TypeScript    │
-   │  client-2  (train)   │  │   Tailwind CSS  │
-   │  client-3  (train)   │  │   Recharts      │
-   └──────────────────────┘  └─────────────────┘
-```
-
-### FedAvg Round Lifecycle
-
-```
-Server opens round
-      │
-      ├─► Client fetches global weights  (GET /weights)
-      ├─► Client trains locally  (E epochs, Adam, CrossEntropyLoss)
-      ├─► Client submits updated weights  (POST /submit)
-      │
-      └─► When all clients submit:
-              w_global = Σ (n_i / n_total) × w_i
-              Save checkpoint → /output/global_model.pt
-              Open next round (or finish)
+┌──────────────────────────────────────────────────────────────────────┐
+│                         Dashboard  :5173                             │
+│              React · TypeScript · Vite · Tailwind · Recharts         │
+└───────────────────────────┬──────────────────────────────────────────┘
+                            │ HTTP (REST)
+┌───────────────────────────▼──────────────────────────────────────────┐
+│                      Controller API  :8080                           │
+│                FastAPI · manages clients, data, training             │
+└──────┬──────────────────────────────────────┬────────────────────────┘
+       │ spawns                               │ reads fl.metrics
+       │                                      │
+┌──────▼──────────────────────────────────────▼────────────────────────┐
+│                           Kafka  :9092                               │
+│  client.weights · global.weights · fl.metrics · fl.status           │
+└──────┬──────────────────────────┬───────────────────────────────────-┘
+       │                          │
+┌──────▼──────────┐   ┌───────────▼──────────────────────────────────┐
+│   FL Clients    │   │              Worker  (type-router)            │
+│  (per client)   │   │  Kafka consumer → HDFS → FedAvg → Kafka      │
+│                 │   │  Routes by message.type:                      │
+│  Train locally  │   │    fl_weights   → aggregate + publish         │
+│  DP noise       │   │    fl_metrics   → forward to controller       │
+│  Publish weights│   │    predictions  → store (future)              │
+│  to Kafka       │   └──────────────────────────────────────────────┘
+└─────────────────┘
 ```
 
 ---
 
 ## Stack
 
-| Layer     | Technology                                             |
-| --------- | ------------------------------------------------------ |
-| FL Server | Python 3.11 · FastAPI · Uvicorn                        |
-| Model     | PyTorch · tabular MLP (BatchNorm + Dropout)            |
-| Clients   | Python 3.11 · PyTorch · Pandas · scikit-learn          |
-| Dashboard | React 19 · TypeScript · Vite · Tailwind CSS · Recharts |
-| Infra     | Docker · Docker Compose · Poetry                       |
+| Layer       | Technology                                                  |
+|-------------|-------------------------------------------------------------|
+| FL Training | Python 3.11 · PyTorch · Flower (gRPC transport)            |
+| Messaging   | Apache Kafka (Confluent) · Zookeeper                        |
+| Storage     | Apache HDFS (bde2020 images) — weight aggregation buffer    |
+| Orchestration | FastAPI · Uvicorn · asyncio subprocesses                  |
+| Model       | TabularMLP — LayerNorm + Dropout · input_dim=20 · 2 classes |
+| Dashboard   | React 19 · TypeScript · Vite · Tailwind CSS · Recharts      |
+| Infra       | Docker · Docker Compose                                     |
 
 ---
 
@@ -64,131 +54,187 @@ Server opens round
 
 ```
 pfa-fl/
-├── core/
-│   ├── server/
-│   │   ├── app/
-│   │   │   ├── main.py          # FastAPI app entry point
-│   │   │   ├── config.py        # Config loading
-│   │   │   ├── state.py         # FLState + ServerState enum
-│   │   │   ├── schemas.py       # Pydantic request/response models
-│   │   │   ├── aggregation.py   # FedAvg implementation
-│   │   │   └── routes/
-│   │   │       ├── control.py   # /health /status /start
-│   │   │       └── federation.py # /register /weights /submit
-│   │   ├── Dockerfile
-│   │   └── pyproject.toml
-│   ├── shared/
-│   │   └── model.py             # Single source of truth — TabularMLP
-│   └── config/
-│       └── config.yaml          # Rounds, min_clients, output path
+├── docker-compose.yml          # Full stack: Kafka + HDFS + all services
 │
-├── clients/
+├── controller/                 # FastAPI orchestration API (:8080)
 │   ├── app/
-│   │   ├── config.py            # Client constants
-│   │   ├── data.py              # CSV loading + StandardScaler
-│   │   ├── trainer.py           # train() + evaluate()
-│   │   └── comms.py             # All HTTP calls to server
-│   ├── client.py                # FL loop entry point
-│   ├── data/                    # Per-client dataset partitions
-│   │   ├── client-1/dataset.csv
-│   │   ├── client-2/dataset.csv
-│   │   └── client-3/dataset.csv
+│   │   ├── main.py
+│   │   ├── routes/
+│   │   │   ├── clients.py      # CRUD for FL participants
+│   │   │   ├── data.py         # Data generation + stats
+│   │   │   ├── training.py     # Start/stop/status training
+│   │   │   └── inference.py    # Email classify + model download
+│   │   └── services/
+│   │       ├── classifier.py   # Feature extraction + inference
+│   │       └── flower.py       # Flower subprocess management
 │   ├── Dockerfile
-│   └── pyproject.toml
+│   ├── docker-compose.yml      # Standalone (no Kafka) — legacy dev mode
+│   └── requirements.txt
 │
-├── dashboard/
+├── fl/
+│   ├── shared/                 # Imported by ALL FL services
+│   │   ├── model.py            # TabularMLP — single source of truth
+│   │   ├── features.py         # 20-feature email extractor
+│   │   ├── schemas.py          # Kafka message dataclasses + serialisation
+│   │   └── kafka_utils.py      # Producer/consumer factory helpers
+│   │
+│   ├── server/                 # Flower server (aggregation strategy)
+│   │   ├── main.py
+│   │   ├── strategy.py         # FedAvg / FedProx strategy
+│   │   └── metrics.py          # Round metrics + confusion matrix
+│   │
+│   ├── client/                 # Flower client (per FL participant)
+│   │   ├── main.py             # NumPyClient + Kafka publisher
+│   │   ├── trainer.py          # Local training + TP/FP/TN/FN eval
+│   │   ├── privacy.py          # DP noise (clip + Gaussian)
+│   │   ├── data.py             # CSV loader + StandardScaler
+│   │   └── finetune.py         # Post-federation personalisation
+│   │
+│   ├── data/                   # Per-client private datasets
+│   │   └── {client-id}/
+│   │       ├── dataset.csv
+│   │       └── model.pt        # Personalised model (post-distribution)
+│   │
+│   └── output/                 # Global model + training logs
+│       ├── global_model.pt
+│       ├── metrics.json
+│       └── logs.jsonl
+│
+├── worker/                     # Kafka consumer + HDFS + aggregation
+│   ├── main.py                 # Entry point (Phase 1: connectivity stub)
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── dashboard/                  # React monitoring UI (:5173)
 │   └── src/
-│       ├── services/api.ts      # Axios calls + TypeScript types
-│       ├── hooks/useFL.ts       # Polling hook (GET /status every 3s)
-│       ├── components/          # Sidebar, StatCard, StatusBadge
-│       └── pages/               # Overview, Metrics, Clients
+│       ├── pages/
+│       │   ├── ClientManager.tsx
+│       │   ├── Training.tsx
+│       │   ├── ClientInbox.tsx
+│       │   ├── Logs.tsx
+│       │   └── Explanation.tsx
+│       ├── components/
+│       │   ├── training/       # ConfusionMatrix, Charts, Timeline
+│       │   ├── client/         # ClientCard, DatasetStats, WorkflowSteps
+│       │   └── explanation/    # Accordion section components
+│       └── services/api.ts     # Axios + TypeScript types
 │
-├── scripts/
-│   ├── generate_data.py         # Synthetic non-IID dataset generator
-│   ├── linux/                   # start-all.sh  stop-all.sh
-│   └── windows/                 # start-all.ps1 stop-all.ps1
-│
-├── output/                      # Saved model checkpoints
-└── .env.example                 # Environment variable template
+└── scripts/
+    └── generate_email_data.py  # Synthetic non-IID dataset generator
 ```
-
----
-
-## Key Design Decisions
-
-**No Flower** — the FL protocol (weight broadcast, submission, aggregation) is implemented from scratch over HTTP using FastAPI and the `requests` library. This makes every step observable and debuggable.
-
-**Independent deployables** — `core/`, `clients/`, and `dashboard/` share no Python imports. The shared model file is injected into client containers via a Docker volume mount at runtime, not at build time.
-
-**Non-IID data** — the data generator partitions samples by label order before splitting, giving each client a skewed class distribution that simulates real-world federated heterogeneity.
-
-**Single API surface** — the FL server is the only backend service. The dashboard polls `GET /status` which returns all state, round info, and metrics history in one response.
 
 ---
 
 ## Quick Start
 
-See [`INSTRUCTIONS.md`](./INSTRUCTIONS.md) for the full step-by-step guide with Docker commands, log inspection, and troubleshooting.
+### 1 — Start infrastructure
 
----
-
-## Experiments & Findings
-
-We ran 6 configurations to find the optimal
-training setup for this FL system.
-
-### Dataset
-
-- 600 samples split across 3 clients
-- 20 features (2 informative, 18 noise)
-- Binary classification (class 0 vs class 1)
-- Non-IID: each client has a skewed class distribution
-
-### Configurations Tested
-
-| #   | Algorithm     | LR    | Data Skew        | Best Acc | Oscillation | Notes                           |
-| --- | ------------- | ----- | ---------------- | -------- | ----------- | ------------------------------- |
-| 1   | FedAvg        | 0.01  | Extreme (90/10)  | 78.07%   | ±11%        | Fast learning, chaotic          |
-| 2   | FedAvg        | 0.001 | Extreme (90/10)  | 64.39%   | ±3%         | Stable but too slow             |
-| 3   | FedAvg        | 0.005 | Extreme (90/10)  | 78.16%   | ±13%        | Same ceiling, more chaos        |
-| 4   | FedProx μ=0.1 | 0.01  | Extreme (90/10)  | 76.32%   | ±12%        | No improvement over FedAvg      |
-| 5   | FedAvg        | 0.01  | Moderate (70/30) | 77.50%   | ±3%         | ✅ Best overall                 |
-| 6   | FedProx μ=0.1 | 0.01  | Moderate (70/30) | 74.17%   | ±4%         | Worse than FedAvg on clean data |
-
-### Key Finding
-
-**The data distribution matters more than the algorithm.**
-
-Fixing the non-IID skew from extreme (90/10) to moderate
-(70/30) improved oscillation from ±11% to ±3% — more than
-any algorithm or learning rate change.
-
-FedAvg with well-structured non-IID data outperforms
-FedProx with extreme non-IID data. FedProx adds a
-proximal term that prevents client drift, but when
-clients are learning genuinely opposite class
-distributions, the proximal term fights valid
-learning signals rather than correcting drift.
-
-### Recommended Config
-
-```yaml
-algorithm: FedAvg
-learning_rate: 0.01
-rounds: 25
-local_epochs: 5
-data_skew: 70/30 (moderate non-IID)
+```bash
+docker compose up -d zookeeper kafka kafka-init hdfs-namenode hdfs-datanode kafka-ui
 ```
 
-### Why FedProx Did Not Help Here
+Wait ~30 s for Kafka to become healthy, then:
 
-FedProx is designed for system heterogeneity —
-slow clients, partial updates, dropped connections.
-It is not designed for extreme data heterogeneity.
-When client-1 has 90% class 0 and client-3 has
-90% class 1, they are not drifting — they are
-learning genuinely different things. The proximal
-term penalizes this valid learning and reduces
-overall model quality.
+```bash
+# Verify topics exist
+docker exec fl-kafka kafka-topics --bootstrap-server localhost:29092 --list
+```
+
+### 2 — Start all services
+
+```bash
+docker compose up -d --build
+```
+
+### 3 — Open the dashboard
+
+`http://localhost:5173`
+
+Use the **Client Manager** to create clients, generate datasets, then go to **Training** to run a federated round.
 
 ---
+
+## Kafka Topics
+
+| Topic            | Producer    | Consumer              | Purpose                         |
+|------------------|-------------|-----------------------|---------------------------------|
+| `client.weights` | FL clients  | Worker                | Local weights after DP noise    |
+| `global.weights` | Worker      | FL clients            | Aggregated global model         |
+| `fl.metrics`     | Worker      | Controller            | Per-round metrics + F1          |
+| `fl.status`      | Controller  | All                   | Training lifecycle events       |
+
+Kafka UI: **`http://localhost:8090`**
+
+---
+
+## Privacy Design
+
+| Data | Location | Ever shared? |
+|------|----------|-------------|
+| Raw email text | `fl/data/{id}/` | Never |
+| Extracted features | Client only | Never |
+| Model weights (pre-noise) | Client only | Never |
+| Model weights (post-DP noise) | Client → Kafka → Worker | Yes |
+| Global model weights | Worker → Kafka → clients | Yes |
+| Aggregate metrics | Worker → Kafka → Controller → Dashboard | Yes |
+
+Differential Privacy applied in `fl/client/privacy.py`:
+- **Gradient clipping** — per-layer L2 norm clipped to `clip_norm`
+- **Gaussian noise** — `σ = noise_mult × clip_norm` added per weight
+
+Both parameters are configurable from the Training page.
+
+---
+
+## Email Feature Set
+
+Each email is represented as **20 numerical features** — raw text never leaves the client.
+
+| # | Feature | # | Feature |
+|---|---------|---|---------|
+| 0 | word_count | 10 | subject_caps_ratio |
+| 1 | char_count | 11 | subject_spam_keywords |
+| 2 | caps_ratio | 12 | has_attachment |
+| 3 | exclamation_count | 13 | reply_to_mismatch |
+| 4 | question_count | 14 | sender_domain_len |
+| 5 | url_count | 15 | html_ratio |
+| 6 | spam_keyword_count | 16 | urgency_word_count |
+| 7 | digit_ratio | 17 | money_word_count |
+| 8 | special_char_ratio | 18 | personal_greeting |
+| 9 | subject_length | 19 | line_break_ratio |
+
+---
+
+## Non-IID Client Profiles
+
+| Profile | Spam % | Dominant pattern | FL relevance |
+|---------|--------|-----------------|--------------|
+| marketing | 70% | High url_count, spam_keywords | Teaches promo detection |
+| balanced | 50% | Mixed | Anchor client |
+| phishing | 30% | High caps, reply_to_mismatch | Teaches spoofing detection |
+
+Federation is genuinely valuable: a model trained on only one client's data misses patterns seen by the others.
+
+---
+
+## Model
+
+**TabularMLP** — `[20 → 128 → 64 → 2]`
+- LayerNorm + ReLU + Dropout(0.3) after each hidden layer
+- LayerNorm (not BatchNorm) — BatchNorm running stats corrupt FedAvg aggregation
+- Trained with Adam + CrossEntropyLoss
+- Configurable: LR schedule (none / cosine / step), local epochs, FedProx μ
+
+---
+
+## Implementation Phases
+
+| Phase | Status | Description |
+|-------|--------|-------------|
+| 1 | Done | Docker Compose — Zookeeper, Kafka, HDFS, Kafka UI |
+| 2 | Done | Kafka message schemas (`schemas.py`) + producer/consumer helpers |
+| 3 | Pending | Worker consumer loop + HDFS storage + FedAvg aggregation |
+| 4 | Pending | Controller Kafka producer/consumer integration |
+| 5 | Pending | FL client Kafka publisher (replaces direct Flower gRPC) |
+| 6 | Pending | Dashboard SSE bridge + port updates |
+| 7 | Pending | Oracle Cloud ARM VM deployment |

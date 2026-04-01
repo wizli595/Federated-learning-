@@ -9,6 +9,8 @@ import Explanation     from "./pages/Explanation";
 import ExperimentsPage from "./pages/ExperimentsPage";
 import Logs            from "./pages/Logs";
 import SimulationPage  from "./pages/SimulationPage";
+import Login           from "./pages/Login";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { health }      from "./services/api";
 
 const PAGE_NAMES: Record<string, string> = {
@@ -20,7 +22,12 @@ const PAGE_NAMES: Record<string, string> = {
   "/explanation":"Docs",
 };
 
-export default function App() {
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { token } = useAuth();
+  return token ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
+function AppShell() {
   const [connected,        setConnected]        = useState(false);
   const [sidebarOpen,      setSidebarOpen]      = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -122,5 +129,16 @@ export default function App() {
         </Routes>
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/*"     element={<RequireAuth><AppShell /></RequireAuth>} />
+      </Routes>
+    </AuthProvider>
   );
 }

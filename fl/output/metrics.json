@@ -5,520 +5,1449 @@
   "rounds": [
     {
       "round": 1,
-      "timestamp": "2026-03-31T10:56:23",
-      "avg_loss": 0.204,
-      "avg_accuracy": 0.9531,
+      "timestamp": "2026-03-31T21:15:57",
+      "avg_loss": 0.2325,
+      "avg_accuracy": 0.9479,
+      "precision": 0.9371,
+      "recall": 0.9874,
+      "f1": 0.9616,
+      "tp": 313,
+      "fp": 21,
+      "tn": 142,
+      "fn": 4,
       "clients": {
-        "meriem": {
-          "loss": 0.1041,
-          "accuracy": 0.9812,
-          "spam_rate": 0.9908,
-          "num_samples": 640
-        },
         "alice": {
-          "loss": 0.3038,
+          "loss": 0.3551,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
+        },
+        "fdfff": {
+          "loss": 0.2401,
+          "accuracy": 0.9375,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
+        },
+        "meriem": {
+          "loss": 0.1022,
+          "accuracy": 0.9812,
+          "spam_rate": 0.9908,
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
         }
       }
     },
     {
       "round": 2,
-      "timestamp": "2026-03-31T10:56:28",
-      "avg_loss": 0.2248,
+      "timestamp": "2026-03-31T21:16:11",
+      "avg_loss": 0.229,
       "avg_accuracy": 0.9479,
+      "precision": 0.9371,
+      "recall": 0.9874,
+      "f1": 0.9616,
+      "tp": 313,
+      "fp": 21,
+      "tn": 142,
+      "fn": 4,
       "clients": {
-        "meriem": {
-          "loss": 0.1279,
-          "accuracy": 0.975,
-          "spam_rate": 0.9908,
-          "num_samples": 640
-        },
         "fdfff": {
-          "loss": 0.2457,
-          "accuracy": 0.9438,
+          "loss": 0.2873,
+          "accuracy": 0.9375,
           "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         },
         "alice": {
           "loss": 0.3008,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
+        },
+        "meriem": {
+          "loss": 0.0989,
+          "accuracy": 0.9812,
+          "spam_rate": 0.9908,
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
         }
       }
     },
     {
       "round": 3,
-      "timestamp": "2026-03-31T10:56:43",
-      "avg_loss": 0.2113,
+      "timestamp": "2026-03-31T21:16:23",
+      "avg_loss": 0.2314,
       "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
         "fdfff": {
-          "loss": 0.2402,
+          "loss": 0.2886,
           "accuracy": 0.9375,
           "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         },
         "meriem": {
-          "loss": 0.1018,
+          "loss": 0.1114,
           "accuracy": 0.975,
           "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 3,
+          "tn": 48,
+          "fn": 1
         },
         "alice": {
-          "loss": 0.2918,
+          "loss": 0.2943,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         }
       }
     },
     {
       "round": 4,
-      "timestamp": "2026-03-31T10:57:02",
-      "avg_loss": 0.2279,
-      "avg_accuracy": 0.9458,
+      "timestamp": "2026-03-31T21:16:36",
+      "avg_loss": 0.2487,
+      "avg_accuracy": 0.9333,
+      "precision": 0.9179,
+      "recall": 0.9874,
+      "f1": 0.9514,
+      "tp": 313,
+      "fp": 28,
+      "tn": 135,
+      "fn": 4,
       "clients": {
+        "meriem": {
+          "loss": 0.101,
+          "accuracy": 0.9812,
+          "spam_rate": 0.9908,
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
+        },
         "alice": {
-          "loss": 0.3141,
+          "loss": 0.2991,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         },
         "fdfff": {
-          "loss": 0.2489,
-          "accuracy": 0.9438,
+          "loss": 0.346,
+          "accuracy": 0.8938,
           "spam_rate": 1.0,
-          "num_samples": 640
-        },
-        "meriem": {
-          "loss": 0.1206,
-          "accuracy": 0.9688,
-          "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 17,
+          "tn": 36,
+          "fn": 0
         }
       }
     },
     {
       "round": 5,
-      "timestamp": "2026-03-31T10:57:21",
-      "avg_loss": 0.221,
-      "avg_accuracy": 0.9458,
+      "timestamp": "2026-03-31T21:16:49",
+      "avg_loss": 0.2244,
+      "avg_accuracy": 0.9479,
+      "precision": 0.9371,
+      "recall": 0.9874,
+      "f1": 0.9616,
+      "tp": 313,
+      "fp": 21,
+      "tn": 142,
+      "fn": 4,
       "clients": {
-        "fdfff": {
-          "loss": 0.2573,
-          "accuracy": 0.9375,
-          "spam_rate": 1.0,
-          "num_samples": 640
-        },
         "meriem": {
-          "loss": 0.1067,
+          "loss": 0.1116,
           "accuracy": 0.975,
           "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 3,
+          "tn": 48,
+          "fn": 1
         },
         "alice": {
-          "loss": 0.2988,
+          "loss": 0.3228,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
+        },
+        "fdfff": {
+          "loss": 0.2389,
+          "accuracy": 0.9438,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 9,
+          "tn": 44,
+          "fn": 0
         }
       }
     },
     {
       "round": 6,
-      "timestamp": "2026-03-31T10:57:39",
-      "avg_loss": 0.2494,
-      "avg_accuracy": 0.9417,
+      "timestamp": "2026-03-31T21:17:03",
+      "avg_loss": 0.2267,
+      "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
-        "meriem": {
-          "loss": 0.1328,
-          "accuracy": 0.9688,
-          "spam_rate": 0.9908,
-          "num_samples": 640
-        },
         "alice": {
-          "loss": 0.3237,
+          "loss": 0.3062,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         },
         "fdfff": {
-          "loss": 0.2917,
+          "loss": 0.2797,
           "accuracy": 0.9312,
           "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 11,
+          "tn": 42,
+          "fn": 0
+        },
+        "meriem": {
+          "loss": 0.0941,
+          "accuracy": 0.9812,
+          "spam_rate": 0.9908,
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
         }
       }
     },
     {
       "round": 7,
-      "timestamp": "2026-03-31T10:57:58",
-      "avg_loss": 0.2278,
-      "avg_accuracy": 0.9479,
+      "timestamp": "2026-03-31T21:17:16",
+      "avg_loss": 0.2263,
+      "avg_accuracy": 0.95,
+      "precision": 0.9399,
+      "recall": 0.9874,
+      "f1": 0.9631,
+      "tp": 313,
+      "fp": 20,
+      "tn": 143,
+      "fn": 4,
       "clients": {
-        "meriem": {
-          "loss": 0.1216,
-          "accuracy": 0.975,
-          "spam_rate": 0.9908,
-          "num_samples": 640
-        },
         "fdfff": {
-          "loss": 0.2629,
+          "loss": 0.2464,
           "accuracy": 0.9438,
           "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 9,
+          "tn": 44,
+          "fn": 0
         },
         "alice": {
-          "loss": 0.2988,
+          "loss": 0.3323,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
+        },
+        "meriem": {
+          "loss": 0.1002,
+          "accuracy": 0.9812,
+          "spam_rate": 0.9908,
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
         }
       }
     },
     {
       "round": 8,
-      "timestamp": "2026-03-31T10:58:17",
-      "avg_loss": 0.2302,
-      "avg_accuracy": 0.9479,
+      "timestamp": "2026-03-31T21:17:25",
+      "avg_loss": 0.2227,
+      "avg_accuracy": 0.95,
+      "precision": 0.9399,
+      "recall": 0.9874,
+      "f1": 0.9631,
+      "tp": 313,
+      "fp": 20,
+      "tn": 143,
+      "fn": 4,
       "clients": {
-        "alice": {
-          "loss": 0.3187,
-          "accuracy": 0.925,
-          "spam_rate": 0.9703,
-          "num_samples": 640
+        "fdfff": {
+          "loss": 0.2491,
+          "accuracy": 0.9438,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 9,
+          "tn": 44,
+          "fn": 0
         },
         "meriem": {
-          "loss": 0.1012,
+          "loss": 0.1006,
           "accuracy": 0.9812,
           "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
         },
-        "fdfff": {
-          "loss": 0.2707,
-          "accuracy": 0.9375,
-          "spam_rate": 1.0,
-          "num_samples": 640
+        "alice": {
+          "loss": 0.3185,
+          "accuracy": 0.925,
+          "spam_rate": 0.9703,
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         }
       }
     },
     {
       "round": 9,
-      "timestamp": "2026-03-31T10:58:35",
-      "avg_loss": 0.2251,
-      "avg_accuracy": 0.9479,
+      "timestamp": "2026-03-31T21:17:37",
+      "avg_loss": 0.2367,
+      "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
-        "meriem": {
-          "loss": 0.1067,
-          "accuracy": 0.9812,
-          "spam_rate": 0.9908,
-          "num_samples": 640
-        },
-        "alice": {
-          "loss": 0.306,
-          "accuracy": 0.925,
-          "spam_rate": 0.9703,
-          "num_samples": 640
-        },
         "fdfff": {
-          "loss": 0.2626,
+          "loss": 0.2885,
           "accuracy": 0.9375,
           "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
+        },
+        "alice": {
+          "loss": 0.2948,
+          "accuracy": 0.925,
+          "spam_rate": 0.9703,
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
+        },
+        "meriem": {
+          "loss": 0.1267,
+          "accuracy": 0.975,
+          "spam_rate": 0.9908,
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 3,
+          "tn": 48,
+          "fn": 1
         }
       }
     },
     {
       "round": 10,
-      "timestamp": "2026-03-31T10:58:49",
-      "avg_loss": 0.2259,
-      "avg_accuracy": 0.95,
+      "timestamp": "2026-03-31T21:17:47",
+      "avg_loss": 0.2293,
+      "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
         "meriem": {
-          "loss": 0.1036,
+          "loss": 0.0977,
           "accuracy": 0.9812,
           "spam_rate": 0.9908,
-          "num_samples": 640
-        },
-        "alice": {
-          "loss": 0.3258,
-          "accuracy": 0.925,
-          "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
         },
         "fdfff": {
-          "loss": 0.2483,
-          "accuracy": 0.9438,
+          "loss": 0.2653,
+          "accuracy": 0.9375,
           "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
+        },
+        "alice": {
+          "loss": 0.3249,
+          "accuracy": 0.9187,
+          "spam_rate": 0.9703,
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 10,
+          "tn": 49,
+          "fn": 3
         }
       }
     },
     {
       "round": 11,
-      "timestamp": "2026-03-31T10:59:13",
-      "avg_loss": 0.2405,
-      "avg_accuracy": 0.9438,
+      "timestamp": "2026-03-31T21:18:01",
+      "avg_loss": 0.2382,
+      "avg_accuracy": 0.9417,
+      "precision": 0.9288,
+      "recall": 0.9874,
+      "f1": 0.9572,
+      "tp": 313,
+      "fp": 24,
+      "tn": 139,
+      "fn": 4,
       "clients": {
+        "fdfff": {
+          "loss": 0.2812,
+          "accuracy": 0.9312,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 11,
+          "tn": 42,
+          "fn": 0
+        },
         "alice": {
-          "loss": 0.3376,
+          "loss": 0.3164,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         },
         "meriem": {
-          "loss": 0.1278,
+          "loss": 0.1171,
           "accuracy": 0.9688,
           "spam_rate": 0.9908,
-          "num_samples": 640
-        },
-        "fdfff": {
-          "loss": 0.2562,
-          "accuracy": 0.9375,
-          "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 4,
+          "tn": 47,
+          "fn": 1
         }
       }
     },
     {
       "round": 12,
-      "timestamp": "2026-03-31T10:59:28",
-      "avg_loss": 0.24,
+      "timestamp": "2026-03-31T21:18:13",
+      "avg_loss": 0.2257,
       "avg_accuracy": 0.9417,
+      "precision": 0.9288,
+      "recall": 0.9874,
+      "f1": 0.9572,
+      "tp": 313,
+      "fp": 24,
+      "tn": 139,
+      "fn": 4,
       "clients": {
         "alice": {
-          "loss": 0.3498,
-          "accuracy": 0.9125,
+          "loss": 0.3199,
+          "accuracy": 0.9062,
           "spam_rate": 0.9703,
-          "num_samples": 640
-        },
-        "fdfff": {
-          "loss": 0.2586,
-          "accuracy": 0.9375,
-          "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 12,
+          "tn": 47,
+          "fn": 3
         },
         "meriem": {
-          "loss": 0.1117,
-          "accuracy": 0.975,
+          "loss": 0.0972,
+          "accuracy": 0.9812,
           "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
+        },
+        "fdfff": {
+          "loss": 0.26,
+          "accuracy": 0.9375,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         }
       }
     },
     {
       "round": 13,
-      "timestamp": "2026-03-31T10:59:44",
-      "avg_loss": 0.235,
-      "avg_accuracy": 0.9396,
+      "timestamp": "2026-03-31T21:18:25",
+      "avg_loss": 0.2239,
+      "avg_accuracy": 0.9479,
+      "precision": 0.9371,
+      "recall": 0.9874,
+      "f1": 0.9616,
+      "tp": 313,
+      "fp": 21,
+      "tn": 142,
+      "fn": 4,
       "clients": {
-        "fdfff": {
-          "loss": 0.2435,
-          "accuracy": 0.9375,
-          "spam_rate": 1.0,
-          "num_samples": 640
+        "alice": {
+          "loss": 0.3148,
+          "accuracy": 0.925,
+          "spam_rate": 0.9703,
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         },
         "meriem": {
-          "loss": 0.1237,
-          "accuracy": 0.9688,
+          "loss": 0.1015,
+          "accuracy": 0.9812,
           "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
         },
-        "alice": {
-          "loss": 0.3378,
-          "accuracy": 0.9125,
-          "spam_rate": 0.9703,
-          "num_samples": 640
+        "fdfff": {
+          "loss": 0.2554,
+          "accuracy": 0.9375,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         }
       }
     },
     {
       "round": 14,
-      "timestamp": "2026-03-31T10:59:57",
-      "avg_loss": 0.246,
-      "avg_accuracy": 0.9438,
+      "timestamp": "2026-03-31T21:18:37",
+      "avg_loss": 0.2295,
+      "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
+        "meriem": {
+          "loss": 0.1064,
+          "accuracy": 0.975,
+          "spam_rate": 0.9908,
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 3,
+          "tn": 48,
+          "fn": 1
+        },
         "alice": {
-          "loss": 0.3322,
+          "loss": 0.3063,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
-        },
-        "meriem": {
-          "loss": 0.138,
-          "accuracy": 0.9688,
-          "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         },
         "fdfff": {
-          "loss": 0.2679,
+          "loss": 0.2757,
           "accuracy": 0.9375,
           "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         }
       }
     },
     {
       "round": 15,
-      "timestamp": "2026-03-31T11:00:12",
-      "avg_loss": 0.2446,
-      "avg_accuracy": 0.9417,
+      "timestamp": "2026-03-31T21:18:48",
+      "avg_loss": 0.23,
+      "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
-        "fdfff": {
-          "loss": 0.261,
-          "accuracy": 0.9375,
-          "spam_rate": 1.0,
-          "num_samples": 640
-        },
         "alice": {
-          "loss": 0.343,
+          "loss": 0.3168,
           "accuracy": 0.9187,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 10,
+          "tn": 49,
+          "fn": 3
         },
         "meriem": {
-          "loss": 0.1299,
-          "accuracy": 0.9688,
+          "loss": 0.0996,
+          "accuracy": 0.9812,
           "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 2,
+          "tn": 49,
+          "fn": 1
+        },
+        "fdfff": {
+          "loss": 0.2736,
+          "accuracy": 0.9375,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         }
       }
     },
     {
       "round": 16,
-      "timestamp": "2026-03-31T11:00:33",
-      "avg_loss": 0.2468,
-      "avg_accuracy": 0.9438,
+      "timestamp": "2026-03-31T21:18:59",
+      "avg_loss": 0.2291,
+      "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
-        "meriem": {
-          "loss": 0.1252,
-          "accuracy": 0.9688,
-          "spam_rate": 0.9908,
-          "num_samples": 640
-        },
-        "fdfff": {
-          "loss": 0.2769,
-          "accuracy": 0.9375,
-          "spam_rate": 1.0,
-          "num_samples": 640
-        },
         "alice": {
-          "loss": 0.3383,
+          "loss": 0.3215,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
+        },
+        "meriem": {
+          "loss": 0.1066,
+          "accuracy": 0.975,
+          "spam_rate": 0.9908,
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 3,
+          "tn": 48,
+          "fn": 1
+        },
+        "fdfff": {
+          "loss": 0.2594,
+          "accuracy": 0.9375,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         }
       }
     },
     {
       "round": 17,
-      "timestamp": "2026-03-31T11:00:48",
-      "avg_loss": 0.2434,
-      "avg_accuracy": 0.9417,
+      "timestamp": "2026-03-31T21:19:10",
+      "avg_loss": 0.2334,
+      "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
         "fdfff": {
-          "loss": 0.2752,
+          "loss": 0.267,
           "accuracy": 0.9375,
           "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         },
         "meriem": {
-          "loss": 0.123,
+          "loss": 0.1052,
           "accuracy": 0.975,
           "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 3,
+          "tn": 48,
+          "fn": 1
         },
         "alice": {
-          "loss": 0.3321,
-          "accuracy": 0.9125,
+          "loss": 0.3279,
+          "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         }
       }
     },
     {
       "round": 18,
-      "timestamp": "2026-03-31T11:01:03",
-      "avg_loss": 0.2463,
-      "avg_accuracy": 0.9438,
+      "timestamp": "2026-03-31T21:19:24",
+      "avg_loss": 0.2343,
+      "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
         "alice": {
-          "loss": 0.3443,
+          "loss": 0.3285,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
-        },
-        "fdfff": {
-          "loss": 0.2684,
-          "accuracy": 0.9375,
-          "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         },
         "meriem": {
-          "loss": 0.1263,
-          "accuracy": 0.9688,
+          "loss": 0.1023,
+          "accuracy": 0.975,
           "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 3,
+          "tn": 48,
+          "fn": 1
+        },
+        "fdfff": {
+          "loss": 0.2722,
+          "accuracy": 0.9375,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         }
       }
     },
     {
       "round": 19,
-      "timestamp": "2026-03-31T11:01:18",
-      "avg_loss": 0.2491,
-      "avg_accuracy": 0.9417,
+      "timestamp": "2026-03-31T21:19:40",
+      "avg_loss": 0.23,
+      "avg_accuracy": 0.9438,
+      "precision": 0.9315,
+      "recall": 0.9874,
+      "f1": 0.9587,
+      "tp": 313,
+      "fp": 23,
+      "tn": 140,
+      "fn": 4,
       "clients": {
         "meriem": {
-          "loss": 0.1267,
-          "accuracy": 0.9688,
+          "loss": 0.1036,
+          "accuracy": 0.975,
           "spam_rate": 0.9908,
-          "num_samples": 640
-        },
-        "alice": {
-          "loss": 0.3417,
-          "accuracy": 0.9187,
-          "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 3,
+          "tn": 48,
+          "fn": 1
         },
         "fdfff": {
-          "loss": 0.279,
-          "accuracy": 0.9375,
+          "loss": 0.2647,
+          "accuracy": 0.9312,
           "spam_rate": 1.0,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 11,
+          "tn": 42,
+          "fn": 0
+        },
+        "alice": {
+          "loss": 0.3218,
+          "accuracy": 0.925,
+          "spam_rate": 0.9703,
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         }
       }
     },
     {
       "round": 20,
-      "timestamp": "2026-03-31T11:01:34",
-      "avg_loss": 0.2483,
-      "avg_accuracy": 0.9438,
+      "timestamp": "2026-03-31T21:19:52",
+      "avg_loss": 0.2369,
+      "avg_accuracy": 0.9458,
+      "precision": 0.9343,
+      "recall": 0.9874,
+      "f1": 0.9601,
+      "tp": 313,
+      "fp": 22,
+      "tn": 141,
+      "fn": 4,
       "clients": {
-        "fdfff": {
-          "loss": 0.2837,
-          "accuracy": 0.9312,
-          "spam_rate": 1.0,
-          "num_samples": 640
-        },
         "meriem": {
-          "loss": 0.1198,
+          "loss": 0.1035,
           "accuracy": 0.975,
           "spam_rate": 0.9908,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 108,
+          "fp": 3,
+          "tn": 48,
+          "fn": 1
+        },
+        "fdfff": {
+          "loss": 0.2779,
+          "accuracy": 0.9375,
+          "spam_rate": 1.0,
+          "num_samples": 640,
+          "tp": 107,
+          "fp": 10,
+          "tn": 43,
+          "fn": 0
         },
         "alice": {
-          "loss": 0.3413,
+          "loss": 0.3293,
           "accuracy": 0.925,
           "spam_rate": 0.9703,
-          "num_samples": 640
+          "num_samples": 640,
+          "tp": 98,
+          "fp": 9,
+          "tn": 50,
+          "fn": 3
         }
       }
     }
   ],
-  "started_at": "2026-03-31T10:56:16",
+  "started_at": "2026-03-31T21:15:38",
   "model_distributed": true,
-  "finished_at": "2026-03-31T11:01:36"
+  "federated_eval": [
+    {
+      "round": 1,
+      "timestamp": "2026-03-31T21:15:57",
+      "weighted_accuracy": 0.9438,
+      "weighted_loss": 0.23,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "meriem": {
+          "accuracy": 0.975,
+          "loss": 0.1274,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9312,
+          "loss": 0.2737,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.289,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 2,
+      "timestamp": "2026-03-31T21:16:11",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.2175,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.2956,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2528,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1042,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 3,
+      "timestamp": "2026-03-31T21:16:23",
+      "weighted_accuracy": 0.9458,
+      "weighted_loss": 0.2323,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.2981,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9312,
+          "loss": 0.2831,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1158,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 4,
+      "timestamp": "2026-03-31T21:16:36",
+      "weighted_accuracy": 0.9479,
+      "weighted_loss": 0.2153,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.2817,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1078,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9375,
+          "loss": 0.2565,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 5,
+      "timestamp": "2026-03-31T21:16:49",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.2153,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.2868,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2557,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1035,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 6,
+      "timestamp": "2026-03-31T21:17:04",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.2116,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2491,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.2848,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.101,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 7,
+      "timestamp": "2026-03-31T21:17:16",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.214,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1065,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.2882,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2473,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 8,
+      "timestamp": "2026-03-31T21:17:25",
+      "weighted_accuracy": 0.9438,
+      "weighted_loss": 0.2269,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "meriem": {
+          "accuracy": 0.975,
+          "loss": 0.1163,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.2942,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9312,
+          "loss": 0.2701,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 9,
+      "timestamp": "2026-03-31T21:17:37",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.2225,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1109,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.2934,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2633,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 10,
+      "timestamp": "2026-03-31T21:17:47",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.2156,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.2987,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2497,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.0984,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 11,
+      "timestamp": "2026-03-31T21:18:01",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.2235,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1067,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.3012,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2628,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 12,
+      "timestamp": "2026-03-31T21:18:13",
+      "weighted_accuracy": 0.9479,
+      "weighted_loss": 0.2181,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2438,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.9187,
+          "loss": 0.3069,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1036,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 13,
+      "timestamp": "2026-03-31T21:18:25",
+      "weighted_accuracy": 0.9479,
+      "weighted_loss": 0.2207,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2446,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.975,
+          "loss": 0.1024,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.3151,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 14,
+      "timestamp": "2026-03-31T21:18:37",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.217,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.3016,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.0999,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2496,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 15,
+      "timestamp": "2026-03-31T21:18:48",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.2227,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1017,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2535,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.3129,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 16,
+      "timestamp": "2026-03-31T21:19:00",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.2237,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2558,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.3146,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1006,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 17,
+      "timestamp": "2026-03-31T21:19:10",
+      "weighted_accuracy": 0.9458,
+      "weighted_loss": 0.2284,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1022,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.9125,
+          "loss": 0.3265,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2566,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 18,
+      "timestamp": "2026-03-31T21:19:24",
+      "weighted_accuracy": 0.9479,
+      "weighted_loss": 0.223,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1008,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2559,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.9187,
+          "loss": 0.3124,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 19,
+      "timestamp": "2026-03-31T21:19:40",
+      "weighted_accuracy": 0.9417,
+      "weighted_loss": 0.2272,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "alice": {
+          "accuracy": 0.9125,
+          "loss": 0.3199,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9375,
+          "loss": 0.2542,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        },
+        "meriem": {
+          "accuracy": 0.975,
+          "loss": 0.1076,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        }
+      }
+    },
+    {
+      "round": 20,
+      "timestamp": "2026-03-31T21:19:53",
+      "weighted_accuracy": 0.95,
+      "weighted_loss": 0.2237,
+      "weighted_spam_rate": 0.987,
+      "clients": {
+        "meriem": {
+          "accuracy": 0.9812,
+          "loss": 0.1012,
+          "spam_rate": 0.9908,
+          "num_samples": 160
+        },
+        "alice": {
+          "accuracy": 0.925,
+          "loss": 0.3101,
+          "spam_rate": 0.9703,
+          "num_samples": 160
+        },
+        "fdfff": {
+          "accuracy": 0.9438,
+          "loss": 0.2597,
+          "spam_rate": 1.0,
+          "num_samples": 160
+        }
+      }
+    }
+  ],
+  "finetuning_complete": true,
+  "finished_at": "2026-03-31T21:20:14"
 }

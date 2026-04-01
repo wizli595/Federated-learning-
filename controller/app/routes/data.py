@@ -72,6 +72,51 @@ async def generate_one(client_id: str, samples: int = 800, seed: int = 42):
     return {"message": f"data generated for {client_id}", "output": result.stdout}
 
 
+@router.get("/stats")
+def data_stats() -> Dict:
+    """Return per-client dataset statistics (total, spam/ham counts, feature means)."""
+    import csv as _csv
+
+    result: Dict = {}
+    for path in sorted(CLIENTS_DIR.glob("*.json")):
+        with open(path) as f:
+            cfg = json.load(f)
+        cid      = cfg["id"]
+        csv_path = DATA_DIR / cid / "dataset.csv"
+        if not csv_path.exists():
+            continue
+
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            reader = _csv.DictReader(f)
+            rows   = list(reader)
+
+        if not rows:
+            continue
+
+        feature_names = [k for k in rows[0] if k != "label"]
+        spam_rows = [r for r in rows if int(r["label"]) == 1]
+        ham_rows  = [r for r in rows if int(r["label"]) == 0]
+        total = len(rows)
+        spam  = len(spam_rows)
+        ham   = len(ham_rows)
+
+        features: Dict[str, Dict[str, float]] = {}
+        for feat in feature_names:
+            features[feat] = {
+                "spam_mean": round(sum(float(r[feat]) for r in spam_rows) / max(spam, 1), 4),
+                "ham_mean":  round(sum(float(r[feat]) for r in ham_rows)  / max(ham,  1), 4),
+            }
+
+        result[cid] = {
+            "total":      total,
+            "spam":       spam,
+            "ham":        ham,
+            "spam_ratio": round(spam / max(total, 1), 4),
+            "features":   features,
+        }
+    return result
+
+
 @router.get("/status")
 def data_status() -> Dict[str, bool]:
     """Return whether a dataset exists for each configured client."""

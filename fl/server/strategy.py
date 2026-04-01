@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import torch
-from flwr.common import FitIns, FitRes, Parameters, Scalar, parameters_to_ndarrays
+from flwr.common import EvaluateRes, FitIns, FitRes, Parameters, Scalar, parameters_to_ndarrays
 from flwr.server.client_proxy import ClientProxy
 from flwr.server.strategy import FedAvg
 
@@ -82,6 +82,25 @@ class EmailFedAvg(FedAvg):
             self.metrics.record(server_round, results)
             self._save_model(aggregated, server_round)
         return aggregated, agg_metrics
+
+    # ── federated evaluation ───────────────────────────────────────────────────
+
+    def aggregate_evaluate(
+        self,
+        server_round: int,
+        results: List[Tuple[ClientProxy, EvaluateRes]],
+        failures,
+    ) -> Tuple[Optional[float], Dict[str, Scalar]]:
+        aggregated_loss, agg_metrics = super().aggregate_evaluate(server_round, results, failures)
+        if results:
+            self.metrics.record_eval(server_round, results)
+            weighted_acc = self.metrics._eval_history[-1]["weighted_accuracy"]
+            print(
+                f"[server] eval round {server_round} | "
+                f"federated_acc={weighted_acc:.4f} clients={len(results)}",
+                flush=True,
+            )
+        return aggregated_loss, agg_metrics
 
     # ── checkpoint: latest round + best round ──────────────────────────────────
 

@@ -2,7 +2,8 @@ FROM python:3.11-slim
 
 # Install dependencies first (layer cache)
 COPY controller/requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --no-cache-dir --timeout 300 torch --index-url https://download.pytorch.org/whl/cpu \
+ && pip install --no-cache-dir --timeout 300 -r /tmp/requirements.txt
 
 # Mirror the local repo layout so all Path(__file__).parent×4 = /app
 WORKDIR /app

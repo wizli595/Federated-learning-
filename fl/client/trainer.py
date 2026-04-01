@@ -50,8 +50,8 @@ def evaluate(
     model: nn.Module,
     X_test: torch.Tensor,
     y_test: torch.Tensor,
-) -> Tuple[float, float, float]:
-    """Return (loss, accuracy, spam_detection_rate)."""
+) -> Tuple[float, float, float, int, int, int, int]:
+    """Return (loss, accuracy, spam_detection_rate, tp, fp, tn, fn)."""
     model.eval()
     criterion = nn.CrossEntropyLoss()  # unweighted: gives true, comparable loss
     with torch.no_grad():
@@ -64,4 +64,8 @@ def evaluate(
             (preds[spam_mask] == 1).float().mean().item()
             if spam_mask.any() else 0.0
         )
-    return loss, acc, spam_rate
+        tp = int(((preds == 1) & (y_test == 1)).sum())
+        fp = int(((preds == 1) & (y_test == 0)).sum())
+        tn = int(((preds == 0) & (y_test == 0)).sum())
+        fn = int(((preds == 0) & (y_test == 1)).sum())
+    return loss, acc, spam_rate, tp, fp, tn, fn

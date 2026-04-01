@@ -250,9 +250,9 @@ export default function Logs() {
       <div
         ref={logRef}
         onScroll={handleScroll}
-        className="rounded-xl border border-zinc-800 bg-zinc-950 overflow-y-auto
+        className="rounded-2xl border border-zinc-800 bg-zinc-950 overflow-y-auto
                    p-4 font-mono text-xs space-y-px"
-        style={{ height: "calc(100vh - 260px)", minHeight: "320px" }}
+        style={{ height: "calc(100vh - 15rem)", minHeight: "360px" }}
       >
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-600 gap-3">

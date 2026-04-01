@@ -15,30 +15,136 @@ Complete operational guide for the federated email spam detection system.
 
 > Poetry is **not** required. All Python components use `requirements.txt` + `venv`.
 
+Docker Desktop must be running with **at least 6 GB RAM** allocated (Settings → Resources).
+
 ---
 
 ## Architecture Overview
 
 ```
-dashboard/       React UI — client manager, training control, inbox simulation
+dashboard/       React UI + Nginx — client manager, training control, inbox simulation
 controller/      FastAPI — orchestrates clients, data, Flower training, inference
 fl/              Flower FL layer — server (FedAvg/FedProx) + clients
-scripts/         Start/stop helpers and data generation
+worker/          Kafka consumer — FedAvg aggregation, HDFS weight storage
+fl/shared/       Shared schemas and Kafka helpers (cross-service, not cross-import)
+scripts/         Data generation utilities
 ```
 
-**Ports**
+### Service Ports
 
-| Service        | Port |
-| -------------- | ---- |
-| Controller API | 8080 |
-| Flower server  | 8090 |
-| Dashboard      | 5173 |
+| Service           | Port | Notes                         |
+| ----------------- | ---- | ----------------------------- |
+| Dashboard (React) | 3000 | Nginx + React SPA (prod)      |
+| Dashboard (dev)   | 5173 | Vite dev server               |
+| Controller API    | 8080 | FastAPI                       |
+| Flower server     | 8090 | gRPC (internal, FL training)  |
+| Kafka UI          | 8090 | Provectus web UI (prod only)  |
+| HDFS NameNode UI  | 9870 | WebHDFS browser               |
+| Kafka broker      | 9092 | External (host access)        |
+| Zookeeper         | 2181 | Internal                      |
+
+> In production, Kafka UI and Flower server both use 8090 — Kafka UI runs in Docker while Flower is a subprocess spawned inside the controller container.
 
 ---
 
-## 1 — First-Time Setup
+## 1 — Production (Full Stack via Docker Compose)
 
-### 1.1 Install FL Python dependencies
+### 1.1 Start everything
+
+```bash
+# From repo root
+docker compose up -d --build
+```
+
+First run takes ~3–5 minutes to pull images and build. Subsequent runs are faster.
+
+### 1.2 Verify health
+
+```bash
+docker compose ps
+```
+
+All services should show `healthy` or `running` status.
+
+```bash
+# Quick API check
+curl http://localhost:8080/clients        # → []
+curl http://localhost:8080/training/status
+```
+
+### 1.3 Access the stack
+
+| UI                  | URL                        |
+| ------------------- | -------------------------- |
+| Dashboard           | http://localhost:3000      |
+| Controller API docs | http://localhost:8080/docs |
+| Kafka UI            | http://localhost:8090      |
+| HDFS Web UI         | http://localhost:9870      |
+
+### 1.4 Start only infrastructure (Kafka + HDFS)
+
+If you want to run the controller/dashboard outside Docker:
+
+```bash
+docker compose up -d zookeeper kafka kafka-init kafka-ui hdfs-namenode hdfs-datanode
+```
+
+### 1.5 Tear down
+
+```bash
+docker compose down          # stops containers, keeps HDFS volumes
+docker compose down -v       # also deletes HDFS volumes (full reset)
+```
+
+### 1.6 Logs
+
+```bash
+docker logs -f fl-controller    # FastAPI + training subprocess output
+docker logs -f fl-worker        # Kafka consumer + FedAvg aggregation
+docker logs -f fl-kafka         # Broker internals
+docker logs -f fl-dashboard     # Nginx access log
+```
+
+---
+
+## 2 — Development Mode (Without Docker for App Services)
+
+Run infrastructure in Docker and app services locally for hot-reload.
+
+### 2.1 Start infrastructure
+
+```bash
+docker compose up -d zookeeper kafka kafka-init kafka-ui hdfs-namenode hdfs-datanode
+```
+
+### 2.2 Controller
+
+```bash
+cd controller
+python -m venv .venv
+
+# Linux / macOS
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+```
+
+### 2.3 Dashboard
+
+```bash
+# Create .env.local so the dev server hits the controller directly (no Nginx)
+echo "VITE_API_URL=http://localhost:8080" > dashboard/.env.local
+
+cd dashboard
+npm install
+npm run dev       # http://localhost:5173
+```
+
+### 2.4 FL Python environment (for manual Flower runs)
 
 ```bash
 # Linux / macOS
@@ -46,84 +152,32 @@ python3 -m venv fl/.venv
 source fl/.venv/bin/activate
 pip install -r fl/requirements.txt
 
-# Windows (PowerShell)
+# Windows
 python -m venv fl\.venv
 fl\.venv\Scripts\Activate.ps1
 pip install -r fl\requirements.txt
 ```
 
-### 1.2 Install dashboard dependencies
-
-```bash
-cd dashboard
-npm install
-```
-
 ---
 
-## 2 — One-Command Start
-
-```bash
-# Linux / macOS
-bash scripts/linux/start-all.sh
-
-# Windows (PowerShell)
-.\scripts\windows\start-all.ps1
-```
-
-This will:
-1. Create the FL Python venv (if missing) and install dependencies
-2. Build and start the controller container (Docker)
-3. Install dashboard npm deps and start the dev server
-
----
-
-## 3 — Manual Step-by-Step
-
-### 3.1 Start the controller
-
-```bash
-docker compose -f controller/docker-compose.yml up -d --build
-```
-
-Verify:
-
-```bash
-curl http://localhost:8080/health
-# → {"status":"ok"}
-```
-
-### 3.2 Start the dashboard
-
-```bash
-cd dashboard
-npm run dev
-```
-
-Open: [http://localhost:5173](http://localhost:5173)
-
----
-
-## 4 — User Flow (Dashboard)
+## 3 — User Flow (Dashboard)
 
 ### Step 1 — Create clients
 
-Go to **Clients** in the sidebar.
+Go to **Clients** in the sidebar → **Add Client**:
 
-Click **Add Client** and fill in:
-- **ID** — unique slug (e.g. `alice`)
 - **Name** — display name (e.g. `Alice`)
 - **Spam Profile** — determines the non-IID data distribution:
   - `marketing` — 70% spam, high URL count and promotional keywords
   - `balanced`  — 50% spam, mixed marketing and phishing patterns
-  - `phishing`  — 70% spam, high caps ratio, urgency words, spoofed sender
+  - `phishing`  — 30% spam, high caps ratio, urgency words, spoofed sender
 - **Number of Emails** — dataset size (50–2000)
 
 ### Step 2 — Generate data
 
-Click **Generate Data** next to a client, or **Generate All Data** for all clients.
+Click **Generate Data** next to a client, or **Generate All** to generate for all clients at once.
 
-This runs `scripts/generate_email_data.py` which creates:
+This runs `scripts/generate_email_data.py` and writes:
 ```
 fl/data/{client-id}/dataset.csv
 ```
@@ -132,43 +186,42 @@ Each email is represented as 20 extracted features — no raw text is stored.
 
 ### Step 3 — Start training
 
-Go to **Training** in the sidebar.
+Go to **Training** → configure parameters:
 
-Configure (optional):
-- **Rounds** — number of FL rounds (default: 10)
-- **Local Epochs** — training epochs per client per round (default: 5)
-- **Algorithm** — `FedAvg` or `FedProx`
-- **FedProx μ** — proximal term weight (only used with FedProx)
-- **DP Clip Norm** — gradient clipping threshold for differential privacy
-- **DP Noise** — Gaussian noise multiplier (higher = more privacy, less accuracy)
-- **Min Clients** — minimum clients required to start a round
+| Parameter       | Default | Description                                           |
+| --------------- | ------- | ----------------------------------------------------- |
+| Rounds          | 10      | Number of FL rounds                                   |
+| Local Epochs    | 5       | Training epochs per client per round                  |
+| Algorithm       | FedAvg  | `FedAvg` or `FedProx`                                 |
+| FedProx μ       | 0.1     | Proximal term weight (FedProx only)                   |
+| DP Clip Norm    | 1.0     | Gradient clipping threshold (differential privacy)    |
+| DP Noise        | 0.05    | Gaussian noise multiplier (higher = more privacy)     |
+| Min Clients     | 2       | Minimum clients required to start a round             |
 
-Click **Start Training**. The controller will:
-1. Spawn the Flower server (`fl/server.py`)
-2. Spawn one Flower client process per configured client (`fl/client.py`)
-3. Write live metrics to `fl/output/metrics.json` after each round
+Click **Start Training**. The system will:
+1. Publish a `training` status event to Kafka (`fl.status`)
+2. Spawn the Flower gRPC server (`fl/server/main.py`)
+3. Spawn one Flower client process per configured client
+4. Each client trains locally, applies DP noise, and publishes weights to Kafka (`client.weights`)
+5. The Worker aggregates via FedAvg and pushes global weights + metrics back through Kafka
+6. The dashboard receives live round updates via SSE — rounds sourced from Kafka show a **Worker** badge
 
-The chart and round table update every 2 seconds.
+### Step 4 — Classify emails
 
-### Step 4 — Simulate email classification
+Once training completes, go to **Clients** → **Open Inbox** on any client.
 
-Once training is complete, go back to **Clients**.
+- Click **Generate Random Email** to auto-fill a spam or ham example
+- Or compose manually (From, Reply-To, Subject, Body, attachment toggle)
 
-Click **Open Inbox** on any client.
-
-You can:
-- Click **Generate Random Email** to auto-fill a marketing spam, phishing spam, or legitimate email
-- Or compose one manually (From, Reply-To, Subject, Body, attachment toggle)
-
-Click **Classify Email**. The result shows:
+Click **Classify**. The result shows:
 - **SPAM** or **HAM** verdict with confidence score
-- **Feature breakdown** — the 20 extracted features with their values, spam-indicator features highlighted
+- **Feature breakdown** — the 20 extracted features with values, spam-indicators highlighted
 
-> The model runs on the extracted features only. Raw email text is never stored or transmitted.
+> Raw email text never leaves the client. Only the 20 extracted features are used.
 
 ---
 
-## 5 — CLI Usage
+## 4 — CLI Usage
 
 ### Generate data manually
 
@@ -180,25 +233,16 @@ python scripts/generate_email_data.py \
   --seed        42
 ```
 
-Options:
-
-| Flag            | Default                    | Description                    |
-| --------------- | -------------------------- | ------------------------------ |
-| `--clients-dir` | `controller/app/clients`   | Directory of client JSON files |
-| `--output-dir`  | `fl/data`                  | Output root directory          |
-| `--samples`     | `300`                      | Emails per client              |
-| `--seed`        | `42`                       | Random seed                    |
-
-### Run Flower manually
+### Run Flower manually (dev/debug)
 
 ```bash
 # Terminal 1 — server
-source fl/.venv/bin/activate
-python fl/server.py --rounds 10 --min-clients 2
+source fl/.venv/bin/activate      # or fl\.venv\Scripts\activate on Windows
+python fl/server/main.py --rounds 10 --min-clients 2
 
 # Terminal 2+ — one per client
-python fl/client.py --client-id alice --data-path fl/data/alice/dataset.csv --server 127.0.0.1:8090
-python fl/client.py --client-id bob   --data-path fl/data/bob/dataset.csv   --server 127.0.0.1:8090
+python fl/client/main.py --client-id alice
+python fl/client/main.py --client-id bob
 ```
 
 ### Controller API (curl)
@@ -213,7 +257,7 @@ curl -X POST http://localhost:8080/clients \
      -d '{"id":"alice","name":"Alice","profile":"marketing","num_emails":300}'
 
 # Generate data for all clients
-curl -X POST "http://localhost:8080/data/generate?samples=300"
+curl -X POST http://localhost:8080/data/generate
 
 # Start training
 curl -X POST http://localhost:8080/training/start \
@@ -231,33 +275,18 @@ curl -X POST http://localhost:8080/clients/alice/classify \
 
 ---
 
-## 6 — Stopping the Stack
+## 5 — Output Files
 
-```bash
-# Linux / macOS
-bash scripts/linux/stop-all.sh
-
-# Windows
-.\scripts\windows\stop-all.ps1
-```
-
-Or manually:
-
-```bash
-docker compose -f controller/docker-compose.yml down
-```
-
----
-
-## 7 — Output Files
-
-| File                              | Description                                  |
-| --------------------------------- | -------------------------------------------- |
-| `fl/data/{id}/dataset.csv`        | Client email dataset (20 features + label)   |
-| `fl/data/{id}/model.pt`           | Global model distributed to client after training |
-| `fl/output/global_model.pt`       | Saved global model (last round)              |
-| `fl/output/metrics.json`          | Live training metrics (round, loss, accuracy) |
-| `controller/app/clients/{id}.json`| Client configuration                         |
+| File                               | Description                                        |
+| ---------------------------------- | -------------------------------------------------- |
+| `fl/data/{id}/dataset.csv`         | Client email dataset (20 features + label)         |
+| `fl/data/{id}/model.pt`            | Global model distributed to client after training  |
+| `fl/output/global_model.pt`        | Saved global model (last round)                    |
+| `fl/output/best_model.pt`          | Best model by validation accuracy                  |
+| `fl/output/metrics.json`           | Training metrics (round, loss, accuracy)           |
+| `fl/output/logs.jsonl`             | Structured training log entries                    |
+| `controller/app/clients/{id}.json` | Client configuration                               |
+| `controller/app/experiments.db`    | SQLite experiment history                          |
 
 ### Loading the trained model
 
@@ -265,7 +294,7 @@ docker compose -f controller/docker-compose.yml down
 import torch
 import sys
 sys.path.insert(0, "fl")
-from model import build_model
+from shared.model import build_model
 
 model = build_model(input_dim=20, num_classes=2)
 model.load_state_dict(torch.load("fl/output/global_model.pt", map_location="cpu"))
@@ -274,27 +303,44 @@ model.eval()
 
 ---
 
-## 8 — Privacy Design
+## 6 — Privacy Design
 
-| Data                     | Location          | Ever leaves device? |
-| ------------------------ | ----------------- | ------------------- |
-| Raw email text           | Client only       | Never               |
-| Extracted features (20)  | Client only       | Never               |
-| Model weights (pre-noise)| Client only       | Never               |
-| Model weights (DP-noised)| Client → Server   | Yes (noised)        |
-| Global model weights     | Server → Clients  | Yes                 |
-| Aggregate metrics        | Server → Dashboard| Yes (aggregated)    |
+| Data                      | Location           | Ever shared?        |
+| ------------------------- | ------------------ | ------------------- |
+| Raw email text            | Client only        | Never               |
+| Extracted features (20)   | Client only        | Never               |
+| Model weights (pre-noise) | Client only        | Never               |
+| Model weights (DP-noised) | Client → Kafka → Worker | Yes (noised)   |
+| Global model weights      | Worker → Kafka → Clients | Yes             |
+| Aggregate metrics         | Worker → Kafka → Controller → Dashboard | Yes (aggregated) |
 
-Differential privacy is applied before each weight submission:
+Differential privacy is applied before each weight submission (`fl/client/privacy.py`):
 - Weights are **clipped** to a maximum norm (`clip_norm`)
 - **Gaussian noise** is added scaled by `noise_mult × clip_norm`
 
 ---
 
-## 9 — Troubleshooting
+## 7 — Kafka Topics
 
-**Controller not reachable**
-→ Check `docker ps` — the `fl-controller` container must be running.
+| Topic            | Producer    | Consumer          | Content                    |
+| ---------------- | ----------- | ----------------- | -------------------------- |
+| `client.weights` | FL clients  | Worker            | DP-noised weight arrays    |
+| `global.weights` | Worker      | FL clients        | Aggregated global weights  |
+| `fl.metrics`     | Worker      | Controller        | Round metrics (loss, F1)   |
+| `fl.status`      | Controller  | Worker, clients   | Training lifecycle events  |
+
+Monitor topics live at http://localhost:8090 (Kafka UI).
+
+---
+
+## 8 — Troubleshooting
+
+**`docker compose ps` shows unhealthy containers on first run**
+→ Kafka and HDFS take time to initialise. Wait 60–90 seconds and re-check.
+→ Run `docker logs fl-kafka` to see broker startup progress.
+
+**Controller not reachable on port 8080**
+→ Run `docker ps` — the `fl-controller` container must be running.
 → Run `docker logs fl-controller` to see startup errors.
 
 **"no clients configured" when starting training**
@@ -303,16 +349,42 @@ Differential privacy is applied before each weight submission:
 **"missing datasets" when starting training**
 → Generate data first via the dashboard or `POST /data/generate`.
 
-**Training starts but no rounds appear**
-→ The Flower server needs `min_clients` to connect before starting.
-   Ensure the number of configured clients ≥ `min_clients`.
+**Training starts but no rounds appear in the chart**
+→ The Flower server waits for `min_clients` before starting.
+→ Ensure the number of configured clients ≥ `min_clients`.
+→ Check `docker logs fl-controller` for subprocess errors.
+
+**Rounds appear but no Worker badge (Kafka metrics not arriving)**
+→ Check `docker logs fl-worker` for consumer or HDFS errors.
+→ Kafka UI at http://localhost:8090 — verify `client.weights` topic has messages.
 
 **"no trained model found" when classifying**
 → Training must complete at least one round. Check `fl/output/metrics.json`.
 
 **Dashboard shows "Controller offline"**
-→ The controller is not running on port 8080. Start it with Docker.
+→ The controller is not running or not reachable. In dev mode, check port 8080. In prod, check `docker logs fl-controller`.
+→ If the controller logs show 200 OK but the dashboard still shows offline, the Nginx proxy may be misconfigured. Verify `dashboard/nginx.conf` has the `rewrite ^/api/(.*) /$1 break;` line before `proxy_pass` inside `location /api/`. Without it, `/api/health` is forwarded as-is instead of being stripped to `/health`.
 
-**Port 8090 already in use**
-→ A previous Flower server is still running. Stop it:
-   `pkill -f "fl/server.py"` (Linux) or kill the Python process (Windows Task Manager).
+**Port conflict on startup**
+→ `9092` — another Kafka instance running. Stop it or change the port mapping in `docker-compose.yml`.
+→ `8080` — another service on that port. Run `docker compose down` first.
+
+**HDFS errors in worker logs**
+→ HDFS NameNode may still be initialising. The worker retries automatically.
+→ Check http://localhost:9870 — NameNode must show `active` state.
+
+**"Conflict. The container name is already in use" on `docker compose up`**
+→ A stale container from a previous run exists. Remove it and retry:
+```bash
+docker rm fl-controller fl-worker fl-dashboard 2>/dev/null; docker compose up -d
+```
+Or use the start script which handles this automatically:
+```powershell
+.\scripts\windows\start-all.ps1
+```
+
+**Full reset (wipe all data and volumes)**
+```bash
+docker compose down -v
+rm -rf fl/data/*/dataset.csv fl/output/*.pt fl/output/metrics.json fl/output/logs.jsonl
+```

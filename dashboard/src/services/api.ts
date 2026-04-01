@@ -3,6 +3,32 @@ import axios from "axios";
 export const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
 const api = axios.create({ baseURL: API_BASE, timeout: 15_000 });
 
+const TOKEN_KEY = "spamfl_token";
+
+// Attach JWT to every request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// On 401 → clear token so the app redirects to login
+api.interceptors.response.use(
+  (r) => r,
+  (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem(TOKEN_KEY);
+      window.location.href = "/login";
+    }
+    return Promise.reject(err);
+  }
+);
+
+// ── Auth ───────────────────────────────────────────────────────────────────────
+
+export const loginApi = (code: string): Promise<{ token: string }> =>
+  api.post("/auth/login", { code }).then((r) => r.data);
+
 // ── Client config ──────────────────────────────────────────────────────────────
 
 export interface ClientConfig {
@@ -35,6 +61,17 @@ export const generateClientData = (id: string, samples = 800, seed = 42) =>
 export const dataStatus = (): Promise<Record<string, boolean>> =>
   api.get("/data/status").then((r) => r.data);
 
+export interface ClientDataStats {
+  total: number;
+  spam: number;
+  ham: number;
+  spam_ratio: number;
+  features: Record<string, { spam_mean: number; ham_mean: number }>;
+}
+
+export const dataStats = (): Promise<Record<string, ClientDataStats>> =>
+  api.get("/data/stats").then((r) => r.data);
+
 // ── Logs ───────────────────────────────────────────────────────────────────────
 
 export interface LogEntry {
@@ -58,6 +95,7 @@ export interface StartTrainingRequest {
   noise_mult: number;
   min_clients: number;
   lr_schedule: "none" | "cosine" | "step";
+  finetune_epochs: number;
 }
 
 export interface PerClientRoundMetric {
@@ -65,6 +103,10 @@ export interface PerClientRoundMetric {
   accuracy: number;
   spam_rate: number;
   num_samples: number;
+  tp?: number;
+  fp?: number;
+  tn?: number;
+  fn?: number;
 }
 
 export interface RoundMetric {
@@ -72,7 +114,31 @@ export interface RoundMetric {
   timestamp: string;
   avg_loss: number;
   avg_accuracy: number;
+  precision?: number;
+  recall?: number;
+  f1?: number;
+  tp?: number;
+  fp?: number;
+  tn?: number;
+  fn?: number;
   clients: Record<string, PerClientRoundMetric>;
+  source?: "kafka" | "flower";   // "kafka" = aggregated by Worker via Kafka
+}
+
+export interface FedEvalClientResult {
+  accuracy: number;
+  loss: number;
+  spam_rate: number;
+  num_samples: number;
+}
+
+export interface FedEvalRound {
+  round: number;
+  timestamp: string;
+  weighted_accuracy: number;
+  weighted_loss: number;
+  weighted_spam_rate: number;
+  clients: Record<string, FedEvalClientResult>;
 }
 
 export interface TrainingStatus {
@@ -84,6 +150,8 @@ export interface TrainingStatus {
   model_distributed: boolean;
   started_at?: string;
   finished_at?: string;
+  federated_eval?: FedEvalRound[];
+  finetuning_complete?: boolean;
 }
 
 export const startTraining  = (req: StartTrainingRequest) =>
@@ -112,11 +180,27 @@ export interface ClassifyResponse {
   label: "spam" | "ham";
   confidence: number;
   spam_score: number;
+  model_type: "personalized" | "global";
   feature_breakdown: Record<string, number>;
 }
 
 export const classifyEmail = (clientId: string, req: ClassifyRequest): Promise<ClassifyResponse> =>
   api.post(`/clients/${clientId}/classify`, req).then((r) => r.data);
+
+export interface BatchClassifyResult {
+  row: number;
+  label: "spam" | "ham";
+  confidence: number;
+  spam_score: number;
+  model_type: "personalized" | "global";
+  feature_breakdown: Record<string, number>;
+}
+
+export const classifyBatch = (clientId: string, file: File): Promise<BatchClassifyResult[]> => {
+  const form = new FormData();
+  form.append("file", file);
+  return api.post(`/clients/${clientId}/classify/batch`, form).then((r) => r.data);
+};
 
 export const downloadModel = async (clientId: string) => {
   const resp = await api.get(`/clients/${clientId}/model/download`, { responseType: "blob" });
@@ -124,6 +208,18 @@ export const downloadModel = async (clientId: string) => {
   const a    = document.createElement("a");
   a.href     = url;
   a.download = "global_model.pt";
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+export const exportModelOnnx = async (clientId: string) => {
+  const resp = await api.get(`/clients/${clientId}/model/export`, { responseType: "blob" });
+  const cd   = (resp.headers["content-disposition"] as string) ?? "";
+  const name = cd.match(/filename="([^"]+)"/)?.[1] ?? `${clientId}_model.onnx`;
+  const url  = URL.createObjectURL(resp.data);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = name;
   a.click();
   URL.revokeObjectURL(url);
 };

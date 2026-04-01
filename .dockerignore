@@ -9,9 +9,9 @@
 fl/data/
 fl/output/
 
-# Frontend - not needed in controller image
-dashboard/
+# Frontend build artifacts — source files needed for dashboard image build
 dashboard/node_modules/
+dashboard/dist/
 
 # Git
 .git/
