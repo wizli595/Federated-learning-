@@ -5,8 +5,10 @@ import {
   startTraining,
   stopTraining,
   resetTraining,
+  listPortalClients,
 } from "../services/api";
 import { API_BASE } from "../services/api";
+import type { PortalClient } from "../services/api";
 import type {
   TrainingStatus,
   StartTrainingRequest,
@@ -34,6 +36,7 @@ import {
   Circle,
   Send,
   RotateCcw,
+  Users,
 } from "lucide-react";
 import PageShell from "../components/PageShell";
 import { TrainingConfigPanel } from "../components/training/TrainingConfigPanel";
@@ -68,6 +71,7 @@ export default function Training() {
   const [busy, setBusy] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [portalClients, setPortalClients] = useState<PortalClient[]>([]);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const poll = async () => {
@@ -78,12 +82,26 @@ export default function Training() {
     }
   };
 
+  const pollPortal = async () => {
+    try {
+      setPortalClients(await listPortalClients());
+    } catch {
+      /* portal may not have any clients yet */
+    }
+  };
+
   useEffect(() => {
     poll();
     pollRef.current = setInterval(poll, 2000);
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
+  }, []);
+
+  useEffect(() => {
+    pollPortal();
+    const id = setInterval(pollPortal, 10_000);
+    return () => clearInterval(id);
   }, []);
 
   // Real-time Kafka push: merge Worker-aggregated rounds instantly (no 2 s lag)
@@ -198,6 +216,27 @@ export default function Training() {
     <PageShell
       title="Training"
       subtitle="Start federated learning across all configured clients.">
+      {/* Portal clients ready banner */}
+      {portalClients.filter((c) => c.has_data).length > 0 && (
+        <div className="flex items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+          <Users size={15} className="text-amber-400 shrink-0" />
+          <p className="text-sm text-amber-300">
+            <span className="font-semibold">
+              {portalClients.filter((c) => c.has_data).length} portal client
+              {portalClients.filter((c) => c.has_data).length !== 1 ? "s have" : " has"} uploaded data
+            </span>{" "}
+            and {portalClients.filter((c) => c.has_data).length !== 1 ? "are" : "is"} waiting for a training round.
+          </p>
+          <div className="ml-auto flex gap-1.5 shrink-0">
+            {portalClients.filter((c) => c.has_data).map((c) => (
+              <span key={c.client_id} className="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 font-mono">
+                {c.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Status bar + round progress */}
       <div className="rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
         <div className="flex items-center justify-between p-4">

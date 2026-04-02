@@ -12,7 +12,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
 from . import db
-from .routes import clients, data, training, inference, experiments, auth
+from .routes import clients, data, training, inference, experiments, auth, portal
 from .services import flower, kafka_bridge
 
 # ── Auth middleware ────────────────────────────────────────────────────────────
@@ -20,7 +20,11 @@ _PUBLIC_PATHS = {"/health", "/auth/login"}
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path in _PUBLIC_PATHS:
+        path = request.url.path
+        # Allow CORS preflight, public routes, and all portal self-service routes
+        if (request.method == "OPTIONS"
+                or path in _PUBLIC_PATHS
+                or path.startswith("/portal/")):
             return await call_next(request)
         token = request.headers.get("Authorization", "").removeprefix("Bearer ").strip()
         if not token or not auth.verify_token(token):
@@ -65,6 +69,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(portal.router)
 app.include_router(clients.router)
 app.include_router(data.router)
 app.include_router(training.router)

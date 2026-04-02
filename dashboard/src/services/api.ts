@@ -257,3 +257,14 @@ export const deleteExperiment = (id: number) =>
 // ── Health ─────────────────────────────────────────────────────────────────────
 
 export const health = () => api.get("/health").then((r) => r.data);
+
+// ── Portal clients (public endpoint, no auth needed) ──────────────────────────
+
+export interface PortalClient {
+  client_id: string;
+  name:      string;
+  has_data:  boolean;
+}
+
+export const listPortalClients = (): Promise<PortalClient[]> =>
+  api.get("/portal/clients").then((r) => r.data);

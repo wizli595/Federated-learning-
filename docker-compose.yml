@@ -123,6 +123,20 @@ services:
       - ./fl/shared:/app/fl/shared
     restart: unless-stopped
 
+  # ── Client Portal (React + Nginx) ────────────────────────────────────────
+  client-portal:
+    build:
+      context: ./client-portal
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: fl-client-portal
+    ports:
+      - "4000:80"
+    depends_on:
+      - controller
+    restart: unless-stopped
+
   # ── Dashboard (React + Nginx) ─────────────────────────────────────────────
   dashboard:
     build:

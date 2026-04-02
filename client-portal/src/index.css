@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background-color: #09090b;
+    color: #f4f4f5;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Subtle dot-grid background */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(99,102,241,0.07) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(139,92,246,0.05) 0%, transparent 50%),
+      radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 28px 28px;
+    pointer-events: none;
+  }
+
+  #root { position: relative; z-index: 1; }
+}
+
+/* Slider track */
+input[type="range"] {
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 9999px;
+  background: #3f3f46;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+input[type="range"]:hover::-webkit-slider-thumb {
+  box-shadow: 0 0 0 5px rgba(99,102,241,0.35);
+}
+
+/* Animations */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.animate-fade-up { animation: fade-up 0.45s cubic-bezier(0.22,1,0.36,1) both; }
+
+@keyframes pop {
+  0%   { opacity: 0; transform: scale(0.85); }
+  65%  { transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-pop { animation: pop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(99,102,241,0.3); }
+  50%       { box-shadow: 0 0 22px rgba(99,102,241,0.6); }
+}
+.glow-indigo { animation: glow-pulse 2.5s ease-in-out infinite; }
