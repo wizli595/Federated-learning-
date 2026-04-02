@@ -2,10 +2,10 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer,
 } from "recharts";
-import { GitCompare, Trophy } from "lucide-react";
+import { GitCompare, Trophy, FileDown } from "lucide-react";
 import type { ExperimentRun } from "../../services/api";
 import {
-  fmtPct, fmtLoss, RUN_A_COLOR, RUN_B_COLOR, PARAM_DEFS, buildCompareChartData,
+  fmtPct, fmtLoss, RUN_A_COLOR, RUN_B_COLOR, PARAM_DEFS, buildCompareChartData, exportComparePdf,
 } from "./helpers";
 
 interface Props {
@@ -30,6 +30,16 @@ export function ComparePanel({ a, b, chartData, bestId }: Props) {
         <div className="flex items-center gap-2">
           <GitCompare size={14} className="text-indigo-400" />
           <h2 className="text-sm font-medium text-zinc-300">Run #{a.id} vs Run #{b.id}</h2>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => exportComparePdf(a, b, chartData, bestId)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs border
+                       bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-zinc-200 hover:border-zinc-500 transition"
+            title="Export comparison PDF"
+          >
+            <FileDown size={12} /> PDF
+          </button>
         </div>
         <div className="flex items-center gap-3 text-xs text-zinc-500">
           <span className="flex items-center gap-1.5">

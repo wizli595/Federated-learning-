@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Users, PlayCircle, BookOpen, Wifi, WifiOff, ShieldAlert, FlaskConical,
-  ChevronLeft, ChevronRight, X, ScrollText, Network,
+  ChevronLeft, ChevronRight, X, ScrollText, Network, BrainCircuit,
 } from "lucide-react";
 
 const NAV = [
@@ -14,7 +14,8 @@ const NAV = [
 ];
 
 const NAV_BOTTOM = [
-  { to: "/explanation", label: "Docs", icon: BookOpen },
+  { to: "/model",       label: "Model",     icon: BrainCircuit },
+  { to: "/explanation", label: "Docs",      icon: BookOpen     },
 ];
 
 interface SidebarProps {

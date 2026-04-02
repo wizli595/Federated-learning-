@@ -9,6 +9,7 @@ import Explanation     from "./pages/Explanation";
 import ExperimentsPage from "./pages/ExperimentsPage";
 import Logs            from "./pages/Logs";
 import SimulationPage  from "./pages/SimulationPage";
+import ModelPage       from "./pages/ModelPage";
 import Login           from "./pages/Login";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { health }      from "./services/api";
@@ -19,6 +20,7 @@ const PAGE_NAMES: Record<string, string> = {
   "/logs":       "Logs",
   "/simulation": "Simulation",
   "/experiments":"Experiments",
+  "/model":      "Model",
   "/explanation":"Docs",
 };
 
@@ -125,6 +127,7 @@ function AppShell() {
           <Route path="/logs"                    element={<Logs />} />
           <Route path="/simulation"              element={<SimulationPage />} />
           <Route path="/experiments"             element={<ExperimentsPage />} />
+          <Route path="/model"                   element={<ModelPage />} />
           <Route path="/explanation"             element={<Explanation />} />
         </Routes>
       </main>

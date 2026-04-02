@@ -2,9 +2,9 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer,
 } from "recharts";
-import { Trophy } from "lucide-react";
+import { Trophy, FileDown } from "lucide-react";
 import type { ExperimentRun } from "../../services/api";
-import { fmtPct, fmtDate } from "./helpers";
+import { fmtPct, fmtDate, exportRunPdf } from "./helpers";
 
 interface Props {
   run: ExperimentRun;
@@ -27,7 +27,17 @@ export function RunDetail({ run, isBest }: Props) {
             Run #{run.id} — {run.algorithm.toUpperCase()} — {fmtPct(run.final_accuracy ?? 0)} accuracy
           </h2>
         </div>
-        <span className="text-xs text-zinc-600">{fmtDate(run.started_at)}</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-zinc-600">{fmtDate(run.started_at)}</span>
+          <button
+            onClick={() => exportRunPdf(run)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs border
+                       bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-zinc-200 hover:border-zinc-500 transition"
+            title="Export PDF report"
+          >
+            <FileDown size={12} /> PDF
+          </button>
+        </div>
       </div>
 
       <div className="p-4 space-y-4">

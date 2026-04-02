@@ -10,8 +10,10 @@ import { Features } from "../components/explanation/features";
 import { FedAvg, FedProxSection, DPSection, ModelArch, NonIID } from "../components/explanation/algorithms";
 import { TrainingCfg, MetricsGuide } from "../components/explanation/training";
 import { Experiments, PrivacyTable, Glossary } from "../components/explanation/results";
+import { ArchDiagram } from "../components/explanation/ArchDiagram";
 
 const SECTIONS = [
+  { id: "arch-diagram",  icon: Server,       color: "text-sky-400",    title: "System Architecture Diagram",         Content: ArchDiagram },
   { id: "app-flow",      icon: Zap,          color: "text-blue-400",   title: "Full App Flow — Step by Step",        Content: AppFlow },
   { id: "what-is-fl",   icon: Shield,        color: "text-violet-400", title: "What is Federated Learning?",         Content: WhatIsFL },
   { id: "why-fl-email", icon: Mail,          color: "text-emerald-400",title: "Why Federated Learning for Email Spam?", Content: WhyFLEmail },
@@ -31,13 +33,12 @@ const SECTIONS = [
 ];
 
 export default function Explanation() {
-  const [open, setOpen] = useState<string | null>("app-flow");
+  const [open, setOpen] = useState<string | null>("arch-diagram");
 
   return (
     <PageShell
       title="Documentation"
       subtitle="Everything about SpamFL — full app flow, algorithms, features, and privacy design."
-      size="sm"
     >
       <div className="space-y-3">
         {SECTIONS.map(({ id, icon: Icon, color, title, Content }) => (

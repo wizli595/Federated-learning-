@@ -1,9 +1,9 @@
 import {
   Trash2, ChevronDown, ChevronUp, Trophy,
-  Check, X, GitCompare,
+  Check, X, GitCompare, FileDown,
 } from "lucide-react";
 import type { ExperimentRun } from "../../services/api";
-import { ALGO_COLOR, RUN_A_COLOR, RUN_B_COLOR, fmtPct, fmtLoss, fmtDate } from "./helpers";
+import { ALGO_COLOR, RUN_A_COLOR, RUN_B_COLOR, fmtPct, fmtLoss, fmtDate, exportRunPdf } from "./helpers";
 
 interface Props {
   runs: ExperimentRun[];
@@ -104,6 +104,14 @@ export function RunsTable({
                   </td>
                   <td className="px-3 py-2 text-zinc-400 font-mono">{fmtLoss(r.final_loss)}</td>
                   <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => exportRunPdf(r)}
+                        className="p-1 rounded text-zinc-600 hover:text-zinc-300 transition"
+                        title="Export PDF report"
+                      >
+                        <FileDown size={12} />
+                      </button>
                     {!compareMode && (
                       <div className="flex items-center gap-1">
                         <button
@@ -138,6 +146,7 @@ export function RunsTable({
                         )}
                       </div>
                     )}
+                    </div>
                   </td>
                 </tr>
               );
