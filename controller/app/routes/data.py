@@ -10,6 +10,8 @@ from typing import Dict
 
 from fastapi import APIRouter, HTTPException
 
+from ..domain.stats import compute_client_stats
+
 router = APIRouter(prefix="/data", tags=["data"])
 
 ROOT        = Path(__file__).parent.parent.parent.parent   # repo root
@@ -94,26 +96,9 @@ def data_stats() -> Dict:
             continue
 
         feature_names = [k for k in rows[0] if k != "label"]
-        spam_rows = [r for r in rows if int(r["label"]) == 1]
-        ham_rows  = [r for r in rows if int(r["label"]) == 0]
-        total = len(rows)
-        spam  = len(spam_rows)
-        ham   = len(ham_rows)
-
-        features: Dict[str, Dict[str, float]] = {}
-        for feat in feature_names:
-            features[feat] = {
-                "spam_mean": round(sum(float(r[feat]) for r in spam_rows) / max(spam, 1), 4),
-                "ham_mean":  round(sum(float(r[feat]) for r in ham_rows)  / max(ham,  1), 4),
-            }
-
-        result[cid] = {
-            "total":      total,
-            "spam":       spam,
-            "ham":        ham,
-            "spam_ratio": round(spam / max(total, 1), 4),
-            "features":   features,
-        }
+        stats = compute_client_stats(rows, feature_names)
+        if stats:
+            result[cid] = stats
     return result
 
 

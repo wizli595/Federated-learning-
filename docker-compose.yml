@@ -120,7 +120,7 @@ services:
       PYTHONUNBUFFERED: "1"
     volumes:
       - ./worker:/app/worker          # live-reload during dev
-      - ./fl/shared:/app/fl/shared
+      - ./shared:/app/shared          # shared library (editable install)
     restart: unless-stopped
 
   # ── Client Portal (React + Nginx) ────────────────────────────────────────
@@ -168,7 +168,7 @@ services:
       - ./controller/app/clients:/app/controller/app/clients
       - ./controller/app/experiments.db:/app/controller/app/experiments.db
       - ./scripts:/app/scripts
-      - ./fl/shared:/app/fl/shared
+      - ./shared:/app/shared            # shared library (editable install)
       - ./fl/client:/app/fl/client
       - ./fl/server:/app/fl/server
     env_file:

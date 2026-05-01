@@ -20,8 +20,9 @@ from pathlib import Path
 
 import torch
 
+from shared.model    import build_model, INPUT_DIM, NUM_CLASSES
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from shared.model    import build_model, INPUT_DIM, NUM_CLASSES  # noqa: E402
 from client.data     import load_data                             # noqa: E402
 from client.trainer  import train, evaluate                       # noqa: E402
 

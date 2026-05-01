@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import logging
 
-from fl.shared.schemas import MetricsMessage
+from shared.schemas import MetricsMessage
 
 from worker.router import register
 

@@ -27,10 +27,6 @@ import numpy as np
 
 log = logging.getLogger(__name__)
 
-# Make fl/shared importable from within fl/client/
-_FL_DIR = Path(__file__).parent.parent
-if str(_FL_DIR) not in sys.path:
-    sys.path.insert(0, str(_FL_DIR))
 
 KAFKA_BOOTSTRAP: str = os.getenv("KAFKA_BOOTSTRAP", "kafka:29092")
 

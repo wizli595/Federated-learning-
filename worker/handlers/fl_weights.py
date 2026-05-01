@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 
-from fl.shared.schemas import ClientWeightsMessage
+from shared.schemas import ClientWeightsMessage
 
 from worker.aggregator import ClientSubmission, aggregator
 from worker.hdfs_client import store_client_weights, store_global_weights

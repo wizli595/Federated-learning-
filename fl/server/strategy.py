@@ -15,8 +15,9 @@ from flwr.common import EvaluateRes, FitIns, FitRes, Parameters, Scalar, paramet
 from flwr.server.client_proxy import ClientProxy
 from flwr.server.strategy import FedAvg
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 from shared.model import build_model, set_weights, INPUT_DIM, NUM_CLASSES
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 from server.metrics import MetricsWriter
 
 MODEL_FILE      = Path(__file__).parent.parent / "output" / "global_model.pt"

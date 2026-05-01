@@ -6,7 +6,7 @@ after running local inference — useful for audit trails, A/B comparisons,
 or federated evaluation without sending raw emails.
 
 To activate:
-  1. Add a 'predictions' type to fl/shared/schemas.py
+  1. Add a 'predictions' type to shared/shared/schemas.py
   2. Have FL clients publish PredictionMessage after classify()
   3. Implement the storage/forwarding logic below
 """
@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 
-from fl.shared.schemas import BaseMessage
+from shared.schemas import BaseMessage
 
 from worker.router import register
 

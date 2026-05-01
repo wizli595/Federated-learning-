@@ -16,7 +16,7 @@ services:
       - ./app/experiments.db:/app/controller/app/experiments.db
       # Scripts + FL code mounted — changes apply without rebuilding Docker
       - ../scripts:/app/scripts
-      - ../fl/shared:/app/fl/shared
+      - ../shared:/app/shared
       - ../fl/client:/app/fl/client
       - ../fl/server:/app/fl/server
     environment:

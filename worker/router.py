@@ -23,7 +23,7 @@ handlers/__init__.py.  To add support for a new message type:
   3. No other changes needed — the handler is discovered automatically.
 
 To add a new Kafka topic:
-  1. Add the topic to fl/shared/schemas.py  TOPICS dict
+  1. Add the topic to shared/shared/schemas.py  TOPICS dict
   2. Add it to SUBSCRIBED_TOPICS in worker/main.py
   3. Add a handler file as above
 """
@@ -33,7 +33,7 @@ from __future__ import annotations
 import logging
 from typing import Callable, Dict
 
-from fl.shared.schemas import BaseMessage, parse_message
+from shared.schemas import BaseMessage, parse_message
 
 log = logging.getLogger(__name__)
 

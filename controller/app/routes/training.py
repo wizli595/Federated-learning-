@@ -2,7 +2,6 @@
 training.py — HTTP handlers for training control + SSE log stream.
 """
 
-import asyncio
 import json
 from pathlib import Path
 from typing import Dict, List
@@ -11,7 +10,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from ..services import flower, kafka_bridge
+from ..services import flower, kafka_sse, sse
 from ..state import training
 
 router = APIRouter(prefix="/training", tags=["training"])
@@ -72,7 +71,7 @@ async def stop_training():
 def training_status():
     data = flower.read_metrics()
     # Overlay any rounds received from the Worker via Kafka (authoritative source)
-    data = kafka_bridge.merge_kafka_into(data)
+    data = kafka_sse.merge_into(data)
     data["config"] = training.config
     return data
 
@@ -127,88 +126,28 @@ async def reset_training():
     return {"message": "reset complete", "removed": removed}
 
 
+_SSE_HEADERS = {
+    "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+    "X-Accel-Buffering": "no",
+}
+
+
 @router.get("/kafka-stream")
 async def kafka_metric_stream(request: Request):
-    """
-    SSE endpoint — pushes Worker-aggregated round metrics as they arrive via Kafka.
-    The dashboard subscribes here to get real-time updates without polling.
-
-    Each event is a JSON object matching the RoundMetric schema with an extra
-    'source': 'kafka' field so the dashboard can badge Kafka-sourced rounds.
-    """
-    q = kafka_bridge.subscribe_metrics()
-
-    async def generator():
-        try:
-            while True:
-                if await request.is_disconnected():
-                    break
-                try:
-                    data = await asyncio.wait_for(q.get(), timeout=15.0)
-                    yield f"data: {json.dumps(data)}\n\n"
-                except asyncio.TimeoutError:
-                    yield ": heartbeat\n\n"   # keep connection alive
-        finally:
-            kafka_bridge.unsubscribe_metrics(q)
-
+    """SSE endpoint — pushes Kafka-sourced round metrics in real time."""
     return StreamingResponse(
-        generator(),
+        sse.kafka_stream(request),
         media_type="text/event-stream",
-        headers={
-            "Cache-Control":    "no-cache",
-            "Connection":       "keep-alive",
-            "X-Accel-Buffering": "no",
-        },
+        headers=_SSE_HEADERS,
     )
 
 
 @router.get("/stream")
 async def training_stream(request: Request, tail: bool = False):
-    """SSE endpoint.
-    tail=false (default): replay from start of file then stream new lines.
-    tail=true: skip existing content, stream only new lines from now.
-    """
-    log_file = flower.LOGS
-
-    async def event_generator():
-        last_pos = 0
-        if tail and log_file.exists():
-            try:
-                last_pos = log_file.stat().st_size
-            except OSError:
-                pass
-        while True:
-            # Stop if client disconnected
-            if await request.is_disconnected():
-                break
-
-            lines: list[str] = []
-            if log_file.exists():
-                try:
-                    with open(log_file, "r", encoding="utf-8", errors="replace") as f:
-                        f.seek(last_pos)
-                        lines = f.readlines()
-                        last_pos = f.tell()
-                except OSError:
-                    pass
-
-            for line in lines:
-                line = line.strip()
-                if line:
-                    yield f"data: {line}\n\n"
-
-            # Heartbeat comment keeps the connection alive when no new data
-            if not lines:
-                yield ": heartbeat\n\n"
-
-            await asyncio.sleep(0.3)
-
+    """SSE endpoint — tails logs.jsonl for training output."""
     return StreamingResponse(
-        event_generator(),
+        sse.log_stream(request, flower.LOGS, tail=tail),
         media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection":    "keep-alive",
-            "X-Accel-Buffering": "no",  # disable Nginx buffering
-        },
+        headers=_SSE_HEADERS,
     )

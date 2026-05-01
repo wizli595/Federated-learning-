@@ -4,34 +4,20 @@ No JWT required — entry point for the Client Portal (port 4000).
 """
 
 import json
-import re
-import io
 from pathlib import Path
 
-import pandas as pd
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from ..services import classifier
+from shared.features import FEATURE_NAMES
+
+from ..domain.slugify import slugify
+from ..domain.csv_validator import validate_csv
+from ..services import classifier, flower, kafka_sse
 
 router = APIRouter(prefix="/portal", tags=["portal"])
 
-# Mirrors FEATURE_NAMES in fl/shared/features.py (stable 20-column list)
-_FEATURE_NAMES = [
-    "word_count", "char_count", "caps_ratio", "exclamation_count", "question_count",
-    "url_count", "spam_keyword_count", "digit_ratio", "special_char_ratio",
-    "subject_length", "subject_caps_ratio", "subject_spam_keywords",
-    "has_attachment", "reply_to_mismatch", "sender_domain_len",
-    "html_ratio", "urgency_word_count", "money_word_count",
-    "personal_greeting", "line_break_ratio",
-]
-
 CLIENTS_DIR = Path(__file__).parent.parent / "clients"
-
-
-def _slugify(name: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", name.lower().strip())
-    return slug.strip("-")[:32] or "client"
 
 
 class RegisterRequest(BaseModel):
@@ -45,7 +31,7 @@ def register(req: RegisterRequest):
     if not req.name.strip():
         raise HTTPException(400, "name is required")
 
-    base_id = _slugify(req.name)
+    base_id = slugify(req.name)
     client_id = base_id
     counter = 2
     CLIENTS_DIR.mkdir(exist_ok=True)
@@ -102,30 +88,15 @@ def upload_dataset(client_id: str, payload: UploadPayload):
     if not cfg_path.exists():
         raise HTTPException(404, "client not found")
 
-    if not payload.csv_content.strip():
-        raise HTTPException(400, "csv_content is empty")
-
-    # Validate columns
     try:
-        df = pd.read_csv(io.StringIO(payload.csv_content))
-    except Exception as exc:
-        raise HTTPException(400, f"invalid CSV: {exc}")
-
-    missing = [f for f in _FEATURE_NAMES if f not in df.columns]
-    if missing:
-        raise HTTPException(400, f"missing feature columns: {missing[:5]}")
-    if "label" not in df.columns:
-        raise HTTPException(400, "missing 'label' column")
+        df = validate_csv(payload.csv_content, FEATURE_NAMES)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc))
 
     row_count = len(df)
-    if row_count < 10:
-        raise HTTPException(400, "dataset must have at least 10 rows")
-
     data_dir = Path(__file__).parent.parent.parent.parent / "fl" / "data" / client_id
     data_dir.mkdir(parents=True, exist_ok=True)
-
-    csv_path = data_dir / "dataset.csv"
-    df[_FEATURE_NAMES + ["label"]].to_csv(csv_path, index=False)
+    df.to_csv(data_dir / "dataset.csv", index=False)
 
     return {
         "client_id": client_id,
@@ -141,7 +112,7 @@ _ROOT = Path(__file__).parent.parent.parent.parent
 def portal_training_status():
     """Public training status for portal clients — no JWT required."""
     data = flower.read_metrics()
-    data = kafka_bridge.merge_kafka_into(data)
+    data = kafka_sse.merge_into(data)
 
     rounds = data.get("rounds", [])
     latest = rounds[-1] if rounds else {}

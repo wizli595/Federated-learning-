@@ -1,20 +1,17 @@
-"""Tests for fl/shared/features.py — feature extraction logic."""
+"""Tests for shared/features/ — feature extraction logic."""
 
-import sys
-from pathlib import Path
 import numpy as np
 import pytest
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 from shared.features import (
     extract_features,
     features_to_dict,
     FEATURE_NAMES,
     INPUT_DIM,
-    _domain,
-    _keyword_hits,
-    _url_count,
-    _html_ratio,
+    domain,
+    keyword_hits,
+    url_count,
+    html_ratio,
     SPAM_KEYWORDS,
     URGENCY_WORDS,
     MONEY_WORDS,
@@ -37,47 +34,47 @@ class TestConstants:
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 class TestHelpers:
-    def test_domain_normal(self):
-        assert _domain("user@example.com") == "example.com"
+    def testdomain_normal(self):
+        assert domain("user@example.com") == "example.com"
 
-    def test_domain_no_at(self):
-        assert _domain("not_an_email") == ""
+    def testdomain_no_at(self):
+        assert domain("not_an_email") == ""
 
-    def test_domain_empty(self):
-        assert _domain("") == ""
+    def testdomain_empty(self):
+        assert domain("") == ""
 
-    def test_domain_lowercase(self):
-        assert _domain("USER@EXAMPLE.COM") == "example.com"
+    def testdomain_lowercase(self):
+        assert domain("USER@EXAMPLE.COM") == "example.com"
 
-    def test_keyword_hits_single(self):
-        assert _keyword_hits("win a free prize today", SPAM_KEYWORDS) >= 2
+    def testkeyword_hits_single(self):
+        assert keyword_hits("win a free prize today", SPAM_KEYWORDS) >= 2
 
-    def test_keyword_hits_none(self):
-        assert _keyword_hits("hello how are you", SPAM_KEYWORDS) == 0
+    def testkeyword_hits_none(self):
+        assert keyword_hits("hello how are you", SPAM_KEYWORDS) == 0
 
-    def test_keyword_hits_case_insensitive(self):
-        assert _keyword_hits("WIN A FREE PRIZE", SPAM_KEYWORDS) == _keyword_hits("win a free prize", SPAM_KEYWORDS)
+    def testkeyword_hits_case_insensitive(self):
+        assert keyword_hits("WIN A FREE PRIZE", SPAM_KEYWORDS) == keyword_hits("win a free prize", SPAM_KEYWORDS)
 
-    def test_url_count_http(self):
-        assert _url_count("visit http://example.com and https://other.com") == 2
+    def testurl_count_http(self):
+        assert url_count("visit http://example.com and https://other.com") == 2
 
-    def test_url_count_www(self):
-        assert _url_count("go to www.example.com now") == 1
+    def testurl_count_www(self):
+        assert url_count("go to www.example.com now") == 1
 
-    def test_url_count_none(self):
-        assert _url_count("no links here") == 0
+    def testurl_count_none(self):
+        assert url_count("no links here") == 0
 
-    def test_html_ratio_with_tags(self):
+    def testhtml_ratio_with_tags(self):
         text = "<b>bold</b>"
-        ratio = _html_ratio(text)
+        ratio = html_ratio(text)
         assert 0 < ratio < 1
 
-    def test_html_ratio_no_tags(self):
-        assert _html_ratio("plain text") == 0.0
+    def testhtml_ratio_no_tags(self):
+        assert html_ratio("plain text") == 0.0
 
-    def test_html_ratio_empty(self):
+    def testhtml_ratio_empty(self):
         # max(len(""), 1) = 1, so no division by zero
-        assert _html_ratio("") == 0.0
+        assert html_ratio("") == 0.0
 
 
 # ── extract_features ──────────────────────────────────────────────────────────

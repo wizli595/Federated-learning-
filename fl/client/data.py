@@ -3,8 +3,6 @@ data.py — Load a client's local email dataset.
 Features are already normalised 0-1 by the data generator, so no further scaling is needed.
 """
 
-import sys
-from pathlib import Path
 from typing import Tuple
 
 import numpy as np
@@ -12,7 +10,6 @@ import pandas as pd
 import torch
 from sklearn.model_selection import train_test_split
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 from shared.features import FEATURE_NAMES
 
 

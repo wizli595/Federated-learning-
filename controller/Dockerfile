@@ -8,10 +8,12 @@ RUN pip install --no-cache-dir --timeout 300 torch --index-url https://download.
 # Mirror the local repo layout so all Path(__file__).parent×4 = /app
 WORKDIR /app
 
+COPY shared/ ./shared/
+RUN pip install --no-cache-dir -e ./shared
+
 COPY controller/app/ ./controller/app/
 
-# fl/shared is needed at inference time; fl/server + fl/client for spawning training
-COPY fl/shared/  ./fl/shared/
+# fl/server + fl/client for spawning training
 COPY fl/server/  ./fl/server/
 COPY fl/client/  ./fl/client/
 

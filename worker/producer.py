@@ -12,8 +12,8 @@ from typing import Dict, List
 
 import numpy as np
 
-from fl.shared.kafka_utils import make_producer, publish, flush, TOPICS
-from fl.shared.schemas import GlobalWeightsMessage, MetricsMessage
+from shared.kafka_utils import make_producer, publish, flush, TOPICS
+from shared.schemas import GlobalWeightsMessage, MetricsMessage
 
 log = logging.getLogger(__name__)
 

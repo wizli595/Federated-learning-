@@ -10,7 +10,9 @@ RUN pip install --no-cache-dir --timeout 300 torch --index-url https://download.
 
 WORKDIR /app
 
+COPY shared/ ./shared/
+RUN pip install --no-cache-dir -e ./shared
+
 COPY worker/ ./worker/
-COPY fl/shared/ ./fl/shared/
 
 CMD ["python", "-m", "worker.main"]

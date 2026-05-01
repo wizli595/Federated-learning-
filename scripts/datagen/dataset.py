@@ -2,16 +2,10 @@
 Dataset builder — assembles per-client email feature DataFrames.
 """
 
-import sys
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(ROOT / "fl"))
-
-from shared.features import FEATURE_NAMES  # noqa: E402
+from shared.features import FEATURE_NAMES
 
 from .ham      import HAM_FNS
 from .spam     import SPAM_FNS

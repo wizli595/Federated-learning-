@@ -8,9 +8,10 @@ from pathlib import Path
 import numpy as np
 import torch
 
-sys.path.insert(0, str(Path(__file__).parent))
 from shared.model    import build_model, get_weights, set_weights, num_trainable, INPUT_DIM, NUM_CLASSES
 from shared.features import extract_features, features_to_dict
+
+sys.path.insert(0, str(Path(__file__).parent))
 from client.data     import load_data
 from client.trainer  import train, evaluate
 from client.privacy  import privatize_weights

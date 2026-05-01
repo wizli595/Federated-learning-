@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import logging
 
-from fl.shared.schemas import StatusMessage
+from shared.schemas import StatusMessage
 
 from worker.aggregator import aggregator
 from worker.producer import flush_producer
