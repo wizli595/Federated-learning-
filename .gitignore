@@ -38,7 +38,6 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
-claude.md
-error.txt 
+error.txt
 prompts/
 data/*
